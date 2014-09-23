@@ -51,7 +51,7 @@ val dropHeight = game.rows-game.findFirstEmptySlot(col).get.row
             }
             transition.play()
             game.dropChip(col, RedChip)
-            if(dropHeight)
+            if(dropHeight==1) chip.setVisible(false)
             switchPlayer
           }
         })
