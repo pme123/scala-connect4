@@ -114,22 +114,36 @@ import GameConfig._
     scenario("No solution with new Game") {
       Given("new Game")
       val game = new ConnectFourGame()
-      When("Find first Empty Spot Position")
+      When("check has winning Spots")
       val positions = game.winningSpots(YellowChip)
       Then("Then this is None")
-      assert(positions === None)
+      assert(positions === List.empty)
     }
 
     scenario("Has vertical Winner") {
       Given("Game with vertical Winner")
       val game = new ConnectFourGame()
       for(index <- 0 until 4) game.dropChip(3, RedChip)
-      When("Find first Empty Spot Position")
+      When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
       Then("Then this is None")
+      assert(positions.size === 1)
+      assert(positions(0).size === winningChips)
+    }
+
+
+    scenario("Has horizontal Winner") {
+      Given("Game with horizontal Winner")
+      val game = new ConnectFourGame()
+      for(index <- 0 until 4) game.dropChip(index, RedChip)
+      When("check has winning Spots")
+      val positions = game.winningSpots(RedChip)
+      Then("Then this is None")
+      assert(positions.size === 1)
       assert(positions(0).size === winningChips)
     }
 
 
   }
+
 }

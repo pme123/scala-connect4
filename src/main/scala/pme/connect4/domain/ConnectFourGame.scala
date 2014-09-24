@@ -42,7 +42,7 @@ object Game {
 }
 
 case class Game(val slots: List[Slot]) {
-
+    import GameConfig._
   override def toString = (for(slot<-slots)yield(slot.toString)).mkString("\n")
 
   def findFirstEmpty(slotIndex: Int) : Option[Spot] = {
@@ -54,14 +54,21 @@ case class Game(val slots: List[Slot]) {
     slots(slotIndex).dropChip(chip)
   }
   def winningSpots(chip: Chip): List[Winner] = {
-    val filterredList = (for {
+    val vertWinners = for {
       slot <- slots
      winner: Winner <- slot.verticalWinningSpots(chip)
     }yield {
        winner
-    })
-    println(s"filterredList: $filterredList")
-    filterredList
+    }
+    val horWinners = for {
+      slot <- slots
+      spot <- slot.spots
+    } yield (spot)
+    for {
+      index <- 0 until cols
+    }
+    println(s"horWinners: $horWinners")
+    vertWinners
   }
 }
 
@@ -92,12 +99,11 @@ case class Slot(val col:Int, pSpots: List[Spot])  {
   }
   def verticalWinningSpots(chip: Chip): Option[Winner] = {
     val matchedSpots = spots filter (spot => spot.chip==chip)
+
   val checkedSpots =  matchedSpots.foldLeft(Nil: List[Spot])((r,c:Spot) => r match {
       case x::xs => if(c.row-1==x.row) c::r else r
       case Nil => List(c)
     })
-    println(s"matched: $matchedSpots")
-    println(s"checkedSpots: $checkedSpots")
 
     if(matchedSpots.length<winningChips) None
     else Some(matchedSpots)

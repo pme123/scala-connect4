@@ -3,7 +3,7 @@ package pme.connect4.gui
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
 
-import pme.connect4.domain.{Chip, ConnectFourGame, GameConfig, RedChip, YellowChip}
+import pme.connect4.domain.{GameConfig, Chip, ConnectFourGame, RedChip, YellowChip}
 
 import scalafx.animation.TranslateTransition
 import scalafx.scene.effect.InnerShadow
@@ -18,7 +18,8 @@ import scalafx.util.Duration
  */
 class GameBoard(val gameSize: (Double, Double)) extends Pane {
 
-  import pme.connect4.domain.GameConfig._
+  import GameConfig._
+  import ChipView._
 
   val paneOffsetX = 40
   val paneOffsetY = 80
@@ -30,17 +31,16 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane {
   val fieldWidth = boardWidth / horFieldCount
   val fieldHeight = boardHeight / verFieldCount
   val fourConnect = new ConnectFourGame
-  val colorMap: Map[Chip, Color] = Map(RedChip -> Color.Red, YellowChip -> Color.Yellow)
   var activeChip: Chip = RedChip
 
-  val chipsToPlay: Seq[Ellipse] = {
+  val chipsToPlay: Seq[ChipView] = {
     for {
       col <- 0 until horFieldCount
     } yield {
-      val chip: Ellipse = createChip(col, fieldWidth, fieldHeight, colorMap(activeChip))
+      val chip: ChipView = createChip(col, fieldWidth, fieldHeight, activeChip)
       chip.setOnMouseClicked(new EventHandler[MouseEvent] {
         override def handle(event: MouseEvent) {
-          val newChip = createChip(col, fieldWidth, fieldHeight, colorMap(activeChip))
+          val newChip = createChip(col, fieldWidth, fieldHeight, activeChip)
           content.add(0, newChip)
           val dropHeight = rows - fourConnect.findFirstEmptySlot(col).get.row
           val transition = new TranslateTransition {
@@ -77,25 +77,25 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane {
         radiusY = fieldHeight / 2 - 4 * slotMargin
       }
       val shape = (Shape.subtract(rect, hole)).asInstanceOf[javafx.scene.shape.Path]
-      new SpotView(fourConnect.game.slots(col).spots(row),shape)
+      new SpotView(fourConnect.game.slots(col).spots(verFieldCount-1-row),shape)
     }
   }
 
 
-  def createChip(col: Int, fieldWidth: Double, fieldHeight: Double, color: Color): Ellipse = {
-    val chip: Ellipse = new Ellipse {
+  def createChip(col: Int, fieldWidth: Double, fieldHeight: Double, chip: Chip): ChipView = {
+    val chipView: ChipView = new ChipView(chip) {
       centerX = paneOffsetX + col * fieldWidth + fieldWidth / 2
       centerY = paneOffsetY - fieldHeight / 2
       radiusX = fieldWidth / 2 - 4 * slotMargin
       radiusY = fieldHeight / 2 - 4 * slotMargin
-      fill = color
+      fill = colorMap(chip)
       effect = new InnerShadow {
         offsetX = -3
         offsetY = -3
         radius = 12
       }
     }
-    chip
+    chipView
   }
 
   def switchPlayer = {
@@ -112,8 +112,7 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane {
       spot <- winner
      if (spot.col == spotView.spot.col && spot.row == spotView.spot.row)
 
-    } yield {spotView.fill=Color.Pink
-      println (s"spotView: $spotView")}
+    } yield {spotView.blink}
   }
 
   content = chipsToPlay ++ gameSpots
