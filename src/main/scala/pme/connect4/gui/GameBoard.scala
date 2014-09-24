@@ -29,7 +29,7 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane {
   val boardHeight = gameSize._2 - paneOffsetY * 2
   val fieldWidth = boardWidth / horFieldCount
   val fieldHeight = boardHeight / verFieldCount
-  val game = new ConnectFourGame
+  val fourConnect = new ConnectFourGame
   val colorMap: Map[Chip, Color] = Map(RedChip -> Color.Red, YellowChip -> Color.Yellow)
   var activeChip: Chip = RedChip
 
@@ -42,15 +42,15 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane {
         override def handle(event: MouseEvent) {
           val newChip = createChip(col, fieldWidth, fieldHeight, colorMap(activeChip))
           content.add(0, newChip)
-          val dropHeight = rows - game.findFirstEmptySlot(col).get.row
+          val dropHeight = rows - fourConnect.findFirstEmptySlot(col).get.row
           val transition = new TranslateTransition {
             duration = Duration(1000)
             node = newChip
             byY = dropHeight * fieldHeight
           }
           transition.play()
-          game.dropChip(col, activeChip)
-          if (!game.hasEmptySlot(col)) chip.setVisible(false)
+          fourConnect.dropChip(col, activeChip)
+          if (!fourConnect.hasEmptySlot(col)) chip.setVisible(false)
           checkHasWinner
           switchPlayer
         }
@@ -77,7 +77,7 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane {
         radiusY = fieldHeight / 2 - 4 * slotMargin
       }
       val shape = (Shape.subtract(rect, hole)).asInstanceOf[javafx.scene.shape.Path]
-      new Path(shape)
+      new SpotView(fourConnect.game.slots(col).spots(row),shape)
     }
   }
 
@@ -104,15 +104,16 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane {
   }
 
   def checkHasWinner = {
-    val winners = game.winningSpots(activeChip)
-    gameSpots(0).fill=Color.Pink
+    val winners = fourConnect.winningSpots(activeChip)
+
     for {
       spotView <- gameSpots
       winner <- winners
       spot <- winner
-      if (spot.chip == activeChip)
+     if (spot.col == spotView.spot.col && spot.row == spotView.spot.row)
 
-    } yield (println (s"spotView: $spotView"))
+    } yield {spotView.fill=Color.Pink
+      println (s"spotView: $spotView")}
   }
 
   content = chipsToPlay ++ gameSpots
