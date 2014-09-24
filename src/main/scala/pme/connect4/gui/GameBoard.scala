@@ -23,11 +23,6 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane {
   val game = new ConnectFourGame
   content = showBoard(gameSize._1, gameSize._2)
 
-
-  def changeSize: Unit = {
-    content = showBoard(width.get, height.get)
-  }
-
   def showBoard(gameWidth: Double, gameHeight: Double) = {
     val boardWidth = gameWidth - paneOffsetX * 2
     val boardHeight = gameHeight - paneOffsetY * 2
@@ -51,7 +46,7 @@ val dropHeight = game.rows-game.findFirstEmptySlot(col).get.row
             }
             transition.play()
             game.dropChip(col, RedChip)
-            if(dropHeight==1) chip.setVisible(false)
+            if(!game.hasEmptySlot(col)) chip.setVisible(false)
             switchPlayer
           }
         })

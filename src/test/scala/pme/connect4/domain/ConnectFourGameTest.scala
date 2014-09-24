@@ -10,13 +10,16 @@ class ConnectFourGameTest extends FeatureTester {
     scenario("Create Game.") {
       Given("Nothing")
       When("Create the new Game")
-      val game: Game = Game(4,5)
+      val cols = 4
+      val rows = 5
+      val game: Game = Game(cols,rows)
       Then("All Slots are 'Empty'")
       for {
         slot <- game.slots
         spot <- slot.spots
       } yield assert(spot.chip === SpaceChip)
-
+      assert(game.slots.length === cols)
+      assert(game.slots(0).spots.length === rows)
     }
 
   }
@@ -68,6 +71,28 @@ class ConnectFourGameTest extends FeatureTester {
       Then("Then this is None")
       assert(emptySpot === None)
     }
+
+  }
+  feature("Has empty Spot in Game") {
+    scenario("it has empty spot") {
+      Given("Game")
+      val game = new ConnectFourGame()
+      When("check to have empty spot")
+      val hasEmptySpot = game.hasEmptySlot(3)
+      Then("Then this is 0")
+      assert(hasEmptySpot)
+    }
+
+    scenario("it has not an empty spot") {
+      Given("Game with a filled Slot")
+      val game = new ConnectFourGame()
+      for(count <- 0 to game.rows) game.dropChip(3,RedChip)
+      When("check to have empty spot")
+      val hasEmptySpot = game.hasEmptySlot(3)
+      Then("Then this is 0")
+      assert(!hasEmptySpot)
+    }
+
 
   }
 

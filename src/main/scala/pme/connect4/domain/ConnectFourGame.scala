@@ -18,6 +18,9 @@ class ConnectFourGame {
   def dropChip(slotIndex: Int, chip:Chip): Try[Spot] = {
     game.dropChip(slotIndex,chip)
   }
+  def hasEmptySlot(slotIndex: Int): Boolean = {
+    game.findFirstEmpty(slotIndex) != None
+  }
   
   def winningPositions(chip: Chip): Option[(Spot,Spot,Spot,Spot)] = {
     None
@@ -26,7 +29,7 @@ class ConnectFourGame {
 }
 object Game {
   def apply(cols: Int,rows: Int):Game =
-    Game((for (col <- 0 to cols) yield (Slot(col, rows))).toList)
+    Game((for (col <- 0 until cols) yield (Slot(col, rows))).toList)
 }
 
 case class Game(val slots: List[Slot]) {
@@ -45,7 +48,7 @@ case class Game(val slots: List[Slot]) {
 
 object Slot {
   def apply(col:Int, rows:Int):Slot = {
-    new Slot(col, (for (row <- 0 to rows) yield (new Spot(SpaceChip, col,row))).toList)
+    new Slot(col, (for (row <- 0 until rows) yield (new Spot(SpaceChip, col,row))).toList)
   }
 }
 

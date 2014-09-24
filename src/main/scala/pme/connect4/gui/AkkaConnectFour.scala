@@ -14,14 +14,10 @@ object AkkaConnectFour extends JFXApp {
     title = "Akka Connect Four"
     width = paneSize._1
     height = paneSize._2
-
+    resizable = false
     scene = new Scene(rootPane) {
       fill = Color.LightGreen
     }
-    width onChange gamePane.changeSize
-    height onChange gamePane.changeSize
-
-
   }
 
   lazy val rootPane = new BorderPane {
