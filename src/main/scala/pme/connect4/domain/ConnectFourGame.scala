@@ -1,5 +1,7 @@
 package pme.connect4.domain
 
+import pme.connect4.domain.Game.Winner
+
 import scala.util.{Success, Failure, Try}
 
 
@@ -7,8 +9,8 @@ import scala.util.{Success, Failure, Try}
  * Created by mengelpa on 21.09.14.
  */
 class ConnectFourGame {
-  val rows = 6
-  val cols = 7
+import GameConfig._
+
   val game = Game(cols, rows)
 
   def findFirstEmptySlot(slotIndex: Int) : Option[Spot] = {
@@ -22,17 +24,25 @@ class ConnectFourGame {
     game.findFirstEmpty(slotIndex) != None
   }
   
-  def winningPositions(chip: Chip): Option[(Spot,Spot,Spot,Spot)] = {
-    None
+  def winningSpots(chip: Chip): List[Winner] = {
+    game.winningSpots(chip)
   }
 
 }
+
+object GameConfig {
+  val rows = 6
+  val cols = 7
+  val winningChips = 4
+}
 object Game {
+  type Winner = List[Spot]
   def apply(cols: Int,rows: Int):Game =
     Game((for (col <- 0 until cols) yield (Slot(col, rows))).toList)
 }
 
 case class Game(val slots: List[Slot]) {
+
   override def toString = (for(slot<-slots)yield(slot.toString)).mkString("\n")
 
   def findFirstEmpty(slotIndex: Int) : Option[Spot] = {
@@ -43,7 +53,16 @@ case class Game(val slots: List[Slot]) {
   def dropChip(slotIndex: Int, chip:Chip): Try[Spot] = {
     slots(slotIndex).dropChip(chip)
   }
-
+  def winningSpots(chip: Chip): List[Winner] = {
+    val filterredList = (for {
+      slot <- slots
+     winner: Winner <- slot.verticalWinningSpots(chip)
+    }yield {
+       winner
+    })
+    println(s"filterredList: $filterredList")
+    filterredList
+  }
 }
 
 object Slot {
@@ -54,6 +73,7 @@ object Slot {
 
 
 case class Slot(val col:Int, pSpots: List[Spot])  {
+  import GameConfig._
   var spots = pSpots
   override def toString = spots.mkString(",")
 
@@ -69,6 +89,18 @@ case class Slot(val col:Int, pSpots: List[Spot])  {
      case None =>       Failure(new IllegalArgumentException(s"No Empty Spot in the column $spots.head.col"))
     }
 
+  }
+  def verticalWinningSpots(chip: Chip): Option[Winner] = {
+    val matchedSpots = spots filter (spot => spot.chip==chip)
+  val checkedSpots =  matchedSpots.foldLeft(Nil: List[Spot])((r,c:Spot) => r match {
+      case x::xs => if(c.row-1==x.row) c::r else r
+      case Nil => List(c)
+    })
+    println(s"matched: $matchedSpots")
+    println(s"checkedSpots: $checkedSpots")
+
+    if(matchedSpots.length<winningChips) None
+    else Some(matchedSpots)
   }
 }
 
@@ -88,6 +120,8 @@ case object RedChip extends Chip {
 case object YellowChip extends Chip {
   override def toString = "[o]"
 }
+
+
 
 
 

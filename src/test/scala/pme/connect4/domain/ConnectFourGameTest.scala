@@ -3,7 +3,7 @@ package pme.connect4.domain
 import pme.connect4.util.FeatureTester
 
 class ConnectFourGameTest extends FeatureTester {
-
+import GameConfig._
 
 
   feature("Create Game") {
@@ -86,7 +86,7 @@ class ConnectFourGameTest extends FeatureTester {
     scenario("it has not an empty spot") {
       Given("Game with a filled Slot")
       val game = new ConnectFourGame()
-      for(count <- 0 to game.rows) game.dropChip(3,RedChip)
+      for(count <- 0 to rows) game.dropChip(3,RedChip)
       When("check to have empty spot")
       val hasEmptySpot = game.hasEmptySlot(3)
       Then("Then this is 0")
@@ -115,9 +115,19 @@ class ConnectFourGameTest extends FeatureTester {
       Given("new Game")
       val game = new ConnectFourGame()
       When("Find first Empty Spot Position")
-      val positions = game.winningPositions(YellowChip)
+      val positions = game.winningSpots(YellowChip)
       Then("Then this is None")
       assert(positions === None)
+    }
+
+    scenario("Has vertical Winner") {
+      Given("Game with vertical Winner")
+      val game = new ConnectFourGame()
+      for(index <- 0 until 4) game.dropChip(3, RedChip)
+      When("Find first Empty Spot Position")
+      val positions = game.winningSpots(RedChip)
+      Then("Then this is None")
+      assert(positions(0).size === winningChips)
     }
 
 
