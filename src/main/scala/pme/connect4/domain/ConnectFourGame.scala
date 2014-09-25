@@ -3,13 +3,14 @@ package pme.connect4.domain
 import pme.connect4.domain.Game.Winner
 
 import scala.util.{Success, Failure, Try}
+import GameConfig._
 
 
 /**
  * Created by mengelpa on 21.09.14.
  */
 class ConnectFourGame {
-import GameConfig._
+
 
   val game = Game(cols, rows)
 
@@ -23,7 +24,7 @@ import GameConfig._
   def hasEmptySlot(slotIndex: Int): Boolean = {
     game.findFirstEmpty(slotIndex) != None
   }
-  
+
   def winningSpots(chip: Chip): List[Winner] = {
     game.winningSpots(chip)
   }
@@ -42,7 +43,6 @@ object Game {
 }
 
 case class Game(val slots: List[Slot]) {
-    import GameConfig._
   override def toString = (for(slot<-slots)yield(slot.toString)).mkString("\n")
 
   def findFirstEmpty(slotIndex: Int) : Option[Spot] = {
@@ -60,15 +60,17 @@ case class Game(val slots: List[Slot]) {
     }yield {
        winner
     }
-    val horWinners = for {
+    val horSpots = (for {
       slot <- slots
       spot <- slot.spots
-    } yield (spot)
-    for {
-      index <- 0 until cols
-    }
-    println(s"horWinners: $horWinners")
-    vertWinners
+    } yield (spot))
+      .groupBy(spot => spot.row).values
+
+    val horWinners = for{
+      horSpot <- horSpots
+      winner: Winner <- Slot.horWinningSpots(chip, horSpot)
+    } yield (winner)
+    vertWinners ++horWinners
   }
 }
 
@@ -76,11 +78,20 @@ object Slot {
   def apply(col:Int, rows:Int):Slot = {
     new Slot(col, (for (row <- 0 until rows) yield (new Spot(SpaceChip, col,row))).toList)
   }
+  def horWinningSpots(chip: Chip, spots: List[Spot]): Option[Winner] = {
+    val matchedSpots = (spots filter (spot => spot.chip==chip))
+      .foldLeft(Nil: List[Spot])((r,c:Spot) => r match {
+      case x::xs => if(c.col-1==x.col) c::r else List(c)
+      case Nil => List(c)
+    })
+    if(matchedSpots.length<winningChips) None
+    else Some(matchedSpots)
+  }
 }
 
 
 case class Slot(val col:Int, pSpots: List[Spot])  {
-  import GameConfig._
+
   var spots = pSpots
   override def toString = spots.mkString(",")
 
@@ -98,13 +109,11 @@ case class Slot(val col:Int, pSpots: List[Spot])  {
 
   }
   def verticalWinningSpots(chip: Chip): Option[Winner] = {
-    val matchedSpots = spots filter (spot => spot.chip==chip)
-
-  val checkedSpots =  matchedSpots.foldLeft(Nil: List[Spot])((r,c:Spot) => r match {
-      case x::xs => if(c.row-1==x.row) c::r else r
+    val matchedSpots = (spots filter (spot => spot.chip==chip))
+      .foldLeft(Nil: List[Spot])((r,c:Spot) => r match {
+      case x::xs => if(c.row-1==x.row) c::r else List(c)
       case Nil => List(c)
     })
-
     if(matchedSpots.length<winningChips) None
     else Some(matchedSpots)
   }

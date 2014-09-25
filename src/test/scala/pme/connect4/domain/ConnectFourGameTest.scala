@@ -120,13 +120,24 @@ import GameConfig._
       assert(positions === List.empty)
     }
 
+    scenario("Has 4 Chips but no vertical Winner") {
+      Given("Game with 4 vertical Chips")
+      val game = new ConnectFourGame()
+      game.dropChip(3, RedChip)
+      game.dropChip(3, YellowChip)
+      for(index <- 0 until 3) game.dropChip(3, RedChip)
+      When("check has winning Spots")
+      val positions = game.winningSpots(RedChip)
+      Then("Then this is None")
+      assert(positions === List.empty)
+    }
     scenario("Has vertical Winner") {
       Given("Game with vertical Winner")
       val game = new ConnectFourGame()
       for(index <- 0 until 4) game.dropChip(3, RedChip)
       When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
-      Then("Then this is None")
+      Then("Then this is has one Winner")
       assert(positions.size === 1)
       assert(positions(0).size === winningChips)
     }
@@ -138,7 +149,7 @@ import GameConfig._
       for(index <- 0 until 4) game.dropChip(index, RedChip)
       When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
-      Then("Then this is None")
+      Then("Then this is has one Winner")
       assert(positions.size === 1)
       assert(positions(0).size === winningChips)
     }
