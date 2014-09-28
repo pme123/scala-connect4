@@ -155,6 +155,59 @@ import GameConfig._
     }
 
 
+    scenario("Has diagonal Winner") {
+      Given("Game with diagonal Winner")
+      val game = new ConnectFourGame()
+      for(index <- 1 until 4) game.dropChip(index, YellowChip)
+      for(index <- 2 until 4) game.dropChip(index, YellowChip)
+      for(index <- 3 until 4) game.dropChip(index, YellowChip)
+      for(index <- 0 until 4) game.dropChip(index, RedChip)
+      When("check has winning Spots")
+      val positions = game.winningSpots(RedChip)
+      Then("Then this is has one Winner")
+      assert(positions.size === 1)
+      assert(positions(0).size === winningChips)
+    }
+    scenario("Has diagonal down Winner") {
+      Given("Game with diagonal down Winner")
+      val game = new ConnectFourGame()
+      for(index <- 0 until 3) game.dropChip(index, YellowChip)
+      for(index <- 0 until 2) game.dropChip(index, YellowChip)
+      for(index <- 0 until 1) game.dropChip(index, YellowChip)
+      for(index <- 0 until 4) game.dropChip(index, RedChip)
+      When("check has winning Spots")
+      val positions = game.winningSpots(RedChip)
+      Then("this has one Winner")
+      assert(positions.size === 1)
+      assert(positions(0).size === winningChips)
+    }
+    scenario("Has diagonal and horizontal Winner") {
+      Given("Game with diagonal and horizontal Winner")
+      val game = new ConnectFourGame()
+      for(index <- 1 until 4) game.dropChip(index, RedChip)
+      for(index <- 2 until 4) game.dropChip(index, YellowChip)
+      for(index <- 3 until 4) game.dropChip(index, YellowChip)
+      for(index <- 0 until 4) game.dropChip(index, RedChip)
+      println(s"game: \n"+game.game)
+      When("check has winning Spots")
+      val positions = game.winningSpots(RedChip)
+      Then("this has two Winners")
+      assert(positions.size === 2)
+      for(pos<-positions) yield ( assert(pos.size === winningChips) )
+    }
+    scenario("Has lots of Winner") {
+      Given("Game with a Cube of Red")
+      val game = new ConnectFourGame()
+      for(index2 <- 0 until 4; index <- 0 until 4) game.dropChip(index, RedChip)
+      println(s"game: "+game.game)
+      When("check has winning Spots")
+      val positions = game.winningSpots(RedChip)
+      Then("Then this is has 4+4+2 Winner")
+      assert(positions.size === 4+4+2)
+      for(pos<-positions) yield ( assert(pos.size === winningChips) )
+    }
+
+
   }
 
 }

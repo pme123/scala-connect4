@@ -3,6 +3,7 @@ package pme.connect4.domain
 import pme.connect4.domain.Game.{WinDirection, Winner, _}
 import pme.connect4.domain.GameConfig._
 
+import scala.collection.immutable.::
 import scala.util.{Failure, Success, Try}
 
 
@@ -68,41 +69,90 @@ case class Game(val slots: List[Slot]) {
   }
 
   def winningSpots(chip: Chip): List[Winner] = {
-    def winningSpots(attempt: List[Spot], direction: WinDirection): List[Winner] = attempt match {
-      case x :: y :: xs if (attempt.size == winningChips) => List(attempt)
-      case x :: y :: xs if (direction == Hor) => {
-        for {
-          nextSpot <- nextSpot(attempt.last, direction)
-        } {
-          println(s"nextSpot: $nextSpot")
-        }
-        List(attempt)
-      }
-      case x :: xs => nextAttempts(attempt, direction)
-      case Nil => throw IllegalAccessError
-    }
-    def nextSpot(spot: Spot, direction: WinDirection): Option[Spot] = (direction match {
-      case Hor if (spot.col + 1 < cols) => Some(slots(spot.col + 1).spots(spot.row))
-      case Ver if (spot.row + 1 < rows) => Some(slots(spot.col + 1).spots(spot.row + 1))
-      case Diag if (spot.col + 1 < cols && spot.row + 1 < rows) => Some(slots(spot.col + 1).spots(spot.row + 1))
-      case _ => None
-    }).filter(nextSpot => spot.chip == nextSpot.chip)
+    val matchedSpots = (for {
+      slot <- slots
+      spot <- slot.spots
+    } yield (spot)).filter(spot => spot.chip == chip)
 
-    def nextAttempts(attempt: List[Spot], direction: WinDirection) = {
-      nextSpot(attempt.last, direction) match {
-        case Some(spot) => winningSpots(attempt ++ List(spot), direction)
-        case None =>
+    def winningSpots(spots: List[Spot], attempt: Winner): List[Winner] = {
+
+      def nextSpots(spot: Spot): List[Option[Spot]] = {
+        println(s"spot: $spot")
+
+        def nextSpot(colOffset: Int, rowOffset: Int): Option[Spot] = {
+          if (spot.col + colOffset < cols && spot.row + rowOffset < rows) {
+            spots
+              .filter(_.col == spot.col + colOffset)
+              .filter(_.row == spot.row + rowOffset)
+            match {
+              case x :: xs =>
+                Some(x)
+              case _ => None
+            }
+          } else None
+        }
+        List(nextSpot(0, 1), nextSpot(1, 0), nextSpot(1, 1), nextSpot(-1, 1))
       }
-      direction match {
-        case Hor => for (nextSpot <- nextSpot(attempt.last, direction)) yield (nextSpot)
-        case Ver if (spot.row + 1 < rows) => Some(slots(spot.col + 1).spots(spot.row + 1))
-        case Diag if (spot.col + 1 < cols && spot.row + 1 < rows) => Some(slots(spot.col + 1).spots(spot.row + 1))
-        case _ => None
+      println(s"spots: $spots")
+      println(s"attempt: $attempt")
+      spots match {
+        case spot :: tail =>
+          val solutions = (for {nextSpotOpt <- nextSpots(attempt.last)
+                                nextSpot <- nextSpotOpt
+
+          } yield {
+            println(s"nextSpot: $nextSpot")
+            winningSpots(spots.filterNot(_==nextSpot), attempt ++ List(nextSpot))
+          }).flatten
+          solutions
+
+        case Nil => List(attempt)
       }
     }
-    winningSpots(List(slots(0).spots(0)), Diag)
+    if (matchedSpots isEmpty) Nil
+    else {
+      val allWinners = for(spot <- matchedSpots)yield(winningSpots(matchedSpots.filterNot(_==spot), List(spot)))
+      println(s"allWinners: "+allWinners)
+      allWinners.flatten.filter(_.length == winningChips)
+    }
   }
 
+  /*   def winningSpots(chip: Chip): List[Winner] = {
+       def winningSpots(attempt: List[Spot], direction: WinDirection): List[Winner] = attempt match {
+       case x :: y :: xs if (attempt.size == winningChips) => List(attempt)
+       case x :: y :: xs if (direction == Hor) => {
+         for {
+           nextSpot <- nextSpot(attempt.last, direction)
+         } {
+           println(s"nextSpot: $nextSpot")
+         }
+         List(attempt)
+       }
+       case x :: xs => nextAttempts(attempt, direction)
+       case Nil => throw IllegalAccessError
+     }
+     def nextSpot(spot: Spot, direction: WinDirection): Option[Spot] = (direction match {
+       case Hor if (spot.col + 1 < cols) => Some(slots(spot.col + 1).spots(spot.row))
+       case Ver if (spot.row + 1 < rows) => Some(slots(spot.col + 1).spots(spot.row + 1))
+       case Diag if (spot.col + 1 < cols && spot.row + 1 < rows) => Some(slots(spot.col + 1).spots(spot.row + 1))
+       case _ => None
+     }).filter(nextSpot => spot.chip == nextSpot.chip)
+
+     def nextAttempts(attempt: List[Spot], direction: WinDirection) = {
+       nextSpot(attempt.last, direction) match {
+         case Some(spot) => winningSpots(attempt ++ List(spot), direction)
+         case None =>
+       }
+       direction match {
+         case Hor => for (nextSpot <- nextSpot(attempt.last, direction)) yield (nextSpot)
+         case Ver if (spot.row + 1 < rows) => Some(slots(spot.col + 1).spots(spot.row + 1))
+         case Diag if (spot.col + 1 < cols && spot.row + 1 < rows) => Some(slots(spot.col + 1).spots(spot.row + 1))
+         case _ => None
+       }
+     }
+     winningSpots(List(slots(0).spots(0)), Diag)
+   }
+  */
   def winningSpots2(chip: Chip): List[Winner] = {
     val vertWinners = for {
       slot <- slots
@@ -186,11 +236,11 @@ case object SpaceChip extends Chip {
 }
 
 case object RedChip extends Chip {
-  override def toString = "[x]"
+  override def toString = "[r]"
 }
 
 case object YellowChip extends Chip {
-  override def toString = "[o]"
+  override def toString = "[y]"
 }
 
 
