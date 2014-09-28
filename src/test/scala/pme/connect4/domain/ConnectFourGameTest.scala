@@ -154,6 +154,17 @@ import GameConfig._
       assert(positions(0).size === winningChips)
     }
 
+    scenario("Has horizontal Winner with more than needed") {
+      Given("Game with horizontal Winner")
+      val game = new ConnectFourGame()
+      for(index <- 0 until 5) game.dropChip(index, RedChip)
+      When("check has winning Spots")
+      val positions = game.winningSpots(RedChip)
+      Then("Then this is has two Winners")
+      assert(positions.size === 2)
+      for(pos<-positions) yield ( assert(pos.size === winningChips) )
+    }
+
 
     scenario("Has diagonal Winner") {
       Given("Game with diagonal Winner")
@@ -188,7 +199,6 @@ import GameConfig._
       for(index <- 2 until 4) game.dropChip(index, YellowChip)
       for(index <- 3 until 4) game.dropChip(index, YellowChip)
       for(index <- 0 until 4) game.dropChip(index, RedChip)
-      println(s"game: \n"+game.game)
       When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
       Then("this has two Winners")
@@ -199,7 +209,6 @@ import GameConfig._
       Given("Game with a Cube of Red")
       val game = new ConnectFourGame()
       for(index2 <- 0 until 4; index <- 0 until 4) game.dropChip(index, RedChip)
-      println(s"game: "+game.game)
       When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
       Then("Then this is has 4+4+2 Winner")

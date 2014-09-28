@@ -6,10 +6,6 @@ import pme.connect4.domain.GameConfig._
 import scala.collection.immutable.::
 import scala.util.{Failure, Success, Try}
 
-
-/**
- * Created by mengelpa on 21.09.14.
- */
 class ConnectFourGame {
 
 
@@ -56,6 +52,9 @@ object Game {
 }
 
 case class Game(val slots: List[Slot]) {
+
+  case class Attempt(offset: (Int, Int), spots: List[Spot])
+
   override def toString = (for (slot <- slots) yield (slot.toString)).mkString("\n")
 
   def findFirstEmpty(slotIndex: Int): Option[Spot] = {
@@ -69,109 +68,46 @@ case class Game(val slots: List[Slot]) {
   }
 
   def winningSpots(chip: Chip): List[Winner] = {
+
     val matchedSpots = (for {
       slot <- slots
       spot <- slot.spots
     } yield (spot)).filter(spot => spot.chip == chip)
 
-    def winningSpots(spots: List[Spot], attempt: Winner): List[Winner] = {
+    def nextAttempts(spot: Spot): List[Option[Attempt]] = {
 
-      def nextSpots(spot: Spot): List[Option[Spot]] = {
-        println(s"spot: $spot")
-
-        def nextSpot(colOffset: Int, rowOffset: Int): Option[Spot] = {
-          if (spot.col + colOffset < cols && spot.row + rowOffset < rows) {
-            spots
-              .filter(_.col == spot.col + colOffset)
-              .filter(_.row == spot.row + rowOffset)
-            match {
-              case x :: xs =>
-                Some(x)
-              case _ => None
-            }
-          } else None
-        }
-        List(nextSpot(0, 1), nextSpot(1, 0), nextSpot(1, 1), nextSpot(-1, 1))
+      def nextAttempt(attempt: Attempt): Option[Attempt] = {
+        val spot = attempt.spots.last
+        val colOffset = attempt.offset._1
+        val rowOffset = attempt.offset._2
+        if (spot.col + colOffset < cols && spot.row + rowOffset < rows) {
+          matchedSpots
+            .filter(_.col == spot.col + colOffset)
+            .filter(_.row == spot.row + rowOffset)
+          match {
+            case x :: xs =>
+              val next = Attempt((colOffset, rowOffset), attempt.spots ++ List(x))
+              if (next.spots.length == winningChips) Some(next) else nextAttempt(next)
+            case _ => None
+          }
+        } else None
       }
-      println(s"spots: $spots")
-      println(s"attempt: $attempt")
-      spots match {
-        case spot :: tail =>
-          val solutions = (for {nextSpotOpt <- nextSpots(attempt.last)
-                                nextSpot <- nextSpotOpt
-
-          } yield {
-            println(s"nextSpot: $nextSpot")
-            winningSpots(spots.filterNot(_==nextSpot), attempt ++ List(nextSpot))
-          }).flatten
-          solutions
-
-        case Nil => List(attempt)
-      }
+      List(nextAttempt(Attempt((0, 1), List(spot)))
+        , nextAttempt(Attempt((1, 0), List(spot)))
+        , nextAttempt(Attempt((1, 1), List(spot)))
+        , nextAttempt(Attempt((-1, 1), List(spot))))
     }
+
     if (matchedSpots isEmpty) Nil
     else {
-      val allWinners = for(spot <- matchedSpots)yield(winningSpots(matchedSpots.filterNot(_==spot), List(spot)))
-      println(s"allWinners: "+allWinners)
-      allWinners.flatten.filter(_.length == winningChips)
+     for {
+        matchedSpot <- matchedSpots
+        nextAttemptOpt <- nextAttempts(matchedSpot)
+        nextAttempt <- nextAttemptOpt
+      } yield {
+        nextAttempt.spots
+      }
     }
-  }
-
-  /*   def winningSpots(chip: Chip): List[Winner] = {
-       def winningSpots(attempt: List[Spot], direction: WinDirection): List[Winner] = attempt match {
-       case x :: y :: xs if (attempt.size == winningChips) => List(attempt)
-       case x :: y :: xs if (direction == Hor) => {
-         for {
-           nextSpot <- nextSpot(attempt.last, direction)
-         } {
-           println(s"nextSpot: $nextSpot")
-         }
-         List(attempt)
-       }
-       case x :: xs => nextAttempts(attempt, direction)
-       case Nil => throw IllegalAccessError
-     }
-     def nextSpot(spot: Spot, direction: WinDirection): Option[Spot] = (direction match {
-       case Hor if (spot.col + 1 < cols) => Some(slots(spot.col + 1).spots(spot.row))
-       case Ver if (spot.row + 1 < rows) => Some(slots(spot.col + 1).spots(spot.row + 1))
-       case Diag if (spot.col + 1 < cols && spot.row + 1 < rows) => Some(slots(spot.col + 1).spots(spot.row + 1))
-       case _ => None
-     }).filter(nextSpot => spot.chip == nextSpot.chip)
-
-     def nextAttempts(attempt: List[Spot], direction: WinDirection) = {
-       nextSpot(attempt.last, direction) match {
-         case Some(spot) => winningSpots(attempt ++ List(spot), direction)
-         case None =>
-       }
-       direction match {
-         case Hor => for (nextSpot <- nextSpot(attempt.last, direction)) yield (nextSpot)
-         case Ver if (spot.row + 1 < rows) => Some(slots(spot.col + 1).spots(spot.row + 1))
-         case Diag if (spot.col + 1 < cols && spot.row + 1 < rows) => Some(slots(spot.col + 1).spots(spot.row + 1))
-         case _ => None
-       }
-     }
-     winningSpots(List(slots(0).spots(0)), Diag)
-   }
-  */
-  def winningSpots2(chip: Chip): List[Winner] = {
-    val vertWinners = for {
-      slot <- slots
-      winner: Winner <- slot.verticalWinningSpots(chip)
-    } yield {
-      winner
-    }
-    val horSpots = (for {
-      slot <- slots
-      spot <- slot.spots
-    } yield (spot))
-      .groupBy(spot => spot.row).values
-
-    val horWinners = for {
-      horSpot <- horSpots
-      winner: Winner <- Slot.horWinningSpots(chip, horSpot)
-    } yield (winner)
-
-    vertWinners ++ horWinners
   }
 
 }
@@ -179,16 +115,6 @@ case class Game(val slots: List[Slot]) {
 object Slot {
   def apply(col: Int, rows: Int): Slot = {
     new Slot(col, (for (row <- 0 until rows) yield (new Spot(SpaceChip, col, row))).toList)
-  }
-
-  def horWinningSpots(chip: Chip, spots: List[Spot]): Option[Winner] = {
-    val matchedSpots = (spots filter (spot => spot.chip == chip))
-      .foldLeft(Nil: List[Spot])((r, c: Spot) => r match {
-      case x :: xs => if (c.col - 1 == x.col) c :: r else List(c)
-      case Nil => List(c)
-    })
-    if (matchedSpots.length < winningChips) None
-    else Some(matchedSpots)
   }
 }
 
@@ -214,15 +140,6 @@ case class Slot(val col: Int, pSpots: List[Spot]) {
 
   }
 
-  def verticalWinningSpots(chip: Chip): Option[Winner] = {
-    val matchedSpots = (spots filter (spot => spot.chip == chip))
-      .foldLeft(Nil: List[Spot])((r, c: Spot) => r match {
-      case x :: xs => if (c.row - 1 == x.row) c :: r else List(c)
-      case Nil => List(c)
-    })
-    if (matchedSpots.length < winningChips) None
-    else Some(matchedSpots)
-  }
 }
 
 case class Spot(chip: Chip, col: Int, row: Int) {
