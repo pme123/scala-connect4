@@ -1,13 +1,15 @@
 package pme.connect4.gui
 
+import javafx.event.{ActionEvent, EventHandler}
+
 import scalafx.application.JFXApp
 import scalafx.scene.Scene
+import scalafx.scene.layout.{BorderPane, Pane}
 import scalafx.scene.paint.Color
-import scalafx.scene.layout.BorderPane
 
 object AkkaConnectFour extends JFXApp {
-  val paneSize = (800, 800)
-  val gameSize= (784.0, 762.0)
+
+  import pme.connect4.gui.GuiGameConfig._
 
 
   stage = new JFXApp.PrimaryStage {
@@ -22,9 +24,19 @@ object AkkaConnectFour extends JFXApp {
 
   lazy val rootPane = new BorderPane {
     center = gamePane
+    bottom = controlPane
   }
-  lazy val gamePane = new GameBoard(gameSize)
 
+  def gamePane = new GameBoard(gameSize)
 
+  def controlPane: Pane = {
+    val controlPane = new ControlPane()
+    controlPane.newGameButton.setOnAction(new EventHandler[ActionEvent] {
+      override def handle(event: ActionEvent) {
+        rootPane.center = gamePane
+      }
+    })
+    controlPane
+  }
 
 }

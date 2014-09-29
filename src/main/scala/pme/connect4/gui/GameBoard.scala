@@ -18,18 +18,11 @@ import scalafx.util.Duration
  */
 class GameBoard(val gameSize: (Double, Double)) extends Pane {
 
+  import GuiGameConfig._
   import GameConfig._
   import ChipView._
 
-  val paneOffsetX = 40
-  val paneOffsetY = 80
-  val horFieldCount: Int = 7
-  val verFieldCount: Int = 6
-  val slotMargin = 2
-  val boardWidth = gameSize._1 - paneOffsetX * 2
-  val boardHeight = gameSize._2 - paneOffsetY * 2
-  val fieldWidth = boardWidth / horFieldCount
-  val fieldHeight = boardHeight / verFieldCount
+
   val fourConnect = new ConnectFourGame
   var activeChip: Chip = RedChip
 
