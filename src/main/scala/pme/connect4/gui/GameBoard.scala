@@ -25,6 +25,7 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane {
 
   val fourConnect = new ConnectFourGame
   var activeChip: Chip = RedChip
+  var hasStarted = false
 
   val chipsToPlay: Seq[ChipView] = {
     for {
@@ -97,6 +98,7 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane {
   }
 
   def checkHasWinner = {
+    hasStarted=true
     val winners = fourConnect.winningSpots(activeChip)
 
     for {
