@@ -3,7 +3,8 @@ package pme.connect4.gui
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
 
-import pme.connect4.domain.{GameConfig, Chip, ConnectFourGame, RedChip, YellowChip}
+import pme.connect4.domain.{Chip, ConnectFourGame, RedChip, YellowChip}
+import pme.connect4.util.Subject
 
 import scalafx.animation.TranslateTransition
 import scalafx.scene.effect.InnerShadow
@@ -16,16 +17,16 @@ import scalafx.util.Duration
 /**
  * Created by pascal.mengelt on 18.09.2014.
  */
-class GameBoard(val gameSize: (Double, Double)) extends Pane {
+class GameBoard(val gameSize: (Double, Double)) extends Pane with Subject[GameBoard]{
 
-  import GuiGameConfig._
-  import GameConfig._
-  import ChipView._
+  import pme.connect4.domain.GameConfig._
+  import pme.connect4.gui.ChipView._
+  import pme.connect4.gui.GuiGameConfig._
 
 
   val fourConnect = new ConnectFourGame
   var activeChip: Chip = RedChip
-  var hasStarted = false
+  var gameStarted=false
 
   val chipsToPlay: Seq[ChipView] = {
     for {
@@ -71,7 +72,7 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane {
         radiusY = fieldHeight / 2 - 4 * slotMargin
       }
       val shape = (Shape.subtract(rect, hole)).asInstanceOf[javafx.scene.shape.Path]
-      new SpotView(fourConnect.game.slots(col).spots(verFieldCount-1-row),shape)
+      new SpotView(fourConnect.game.slots(col).spots(verFieldCount - 1 - row), shape)
     }
   }
 
@@ -98,18 +99,22 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane {
   }
 
   def checkHasWinner = {
-    hasStarted=true
+    gameStarted = true
+    notifyObservers()
     val winners = fourConnect.winningSpots(activeChip)
 
     for {
       spotView <- gameSpots
       winner <- winners
       spot <- winner
-     if (spot.col == spotView.spot.col && spot.row == spotView.spot.row)
+      if (spot.col == spotView.spot.col && spot.row == spotView.spot.row)
 
-    } yield {spotView.blink}
+    } yield {
+      spotView.blink
+    }
   }
 
   content = chipsToPlay ++ gameSpots
 
+  notifyObservers()
 }

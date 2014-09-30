@@ -36,16 +36,10 @@ object AkkaConnectFour extends JFXApp {
 
 
   def controlPane: Pane = {
-    val controlPane = new ControlPane()
+    val controlPane = new ControlPane(activeGame)
     controlPane.newGameButton.setOnAction(new EventHandler[ActionEvent] {
       override def handle(event: ActionEvent) {
         rootPane.center = gamePane
-      }
-    })
-    controlPane.changeColorButton.setOnAction(new EventHandler[ActionEvent] {
-      override def handle(event: ActionEvent) {
-       if(activeGame.hasStarted)  controlPane.popupErrorMsg
-        else         activeGame.switchPlayer
       }
     })
     controlPane
