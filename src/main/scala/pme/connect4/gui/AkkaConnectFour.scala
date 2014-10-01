@@ -25,13 +25,15 @@ object AkkaConnectFour extends JFXApp {
   }
 
   lazy val rootPane = new VBox() {
-    content = Seq(controlPane(gameBoard), gameBoard)
+    content = Seq(controlPane, gameBoard, infoPanel)
   }
 
   lazy val gameBoard = new GameBoard
 
 
-  def controlPane(gameBoard:GameBoard): Pane = new ControlPane(gameBoard)
+  lazy val controlPane = new ControlPane(gameBoard)
+
+  lazy val infoPanel = new InfoPane(gameBoard)
 
 
 }

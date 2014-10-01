@@ -146,18 +146,23 @@ case class Spot(chip: Chip, col: Int, row: Int) {
 }
 
 
-sealed abstract class Chip
+sealed abstract class Chip {
+  def name:String
+}
 
 case object SpaceChip extends Chip {
   override def toString = "[ ]"
+  def name = "Space"
 }
 
 case object RedChip extends Chip {
   override def toString = "[r]"
+  def name = "Red"
 }
 
 case object YellowChip extends Chip {
   override def toString = "[y]"
+  def name = "Yellow"
 }
 
 

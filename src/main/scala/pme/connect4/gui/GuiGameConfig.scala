@@ -1,8 +1,8 @@
 package pme.connect4.gui
 
 object GuiGameConfig {
-  val paneSize = (800, 960)
-  val gameSize= (784.0, 922.0)
+  val paneSize = (800, 940)
+  val gameSize= (784.0, 902.0)
 
   val paneOffsetX = 40
   val paneOffsetY = 120

@@ -3,12 +3,11 @@ package pme.connect4.gui
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
 
-import pme.connect4.domain.{Chip, ConnectFourGame, RedChip, YellowChip}
-import pme.connect4.util.Subject
+import pme.connect4.domain._
+import pme.connect4.util.{Observer, Subject}
 
 import scalafx.animation.TranslateTransition
-import scalafx.scene.effect.InnerShadow
-import scalafx.scene.layout.{BorderPane, Pane}
+import scalafx.scene.layout.Pane
 import scalafx.scene.paint.Color
 import scalafx.scene.shape._
 import scalafx.util.Duration
@@ -17,20 +16,23 @@ import scalafx.util.Duration
 /**
  * Created by pascal.mengelt on 18.09.2014.
  */
-class GameBoard extends Pane with Subject[GameBoard]{
+class GameBoard extends Pane {
 
   import pme.connect4.domain.GameConfig._
   import pme.connect4.gui.ChipView._
   import pme.connect4.gui.GuiGameConfig._
 
 
-  var fourConnect = new ConnectFourGame
-  var chipsToPlay:Seq[ChipView]=null
-  var gameSpots:Seq[SpotView]=null
-  var activeChip: Chip = RedChip
-  var gameStarted=false
+  val gameStartedSubject = new GameStartedSubject
+  val gameWinnerSubject = new GameWinnerSubject
 
-  def startNewGame =  {
+  var fourConnect = new ConnectFourGame
+  var chipsToPlay: Seq[ChipView] = null
+  var gameSpots: Seq[SpotView] = null
+  var activeChip: Chip = RedChip
+
+
+  def startNewGame = {
     fourConnect = new ConnectFourGame
     chipsToPlay = initChipsToPlay
     gameSpots = initGameSpots
@@ -62,6 +64,7 @@ class GameBoard extends Pane with Subject[GameBoard]{
       chip
     }
   }
+
   def initGameSpots = {
     for {
       col <- 0 until horFieldCount
@@ -104,8 +107,8 @@ class GameBoard extends Pane with Subject[GameBoard]{
   }
 
   def checkHasWinner = {
-    gameStarted = true
-    notifyObservers()
+    if (!gameStartedSubject.gameStarted) gameStartedSubject.startGame
+
     val winners = fourConnect.winningSpots(activeChip)
 
     for {
@@ -115,8 +118,38 @@ class GameBoard extends Pane with Subject[GameBoard]{
       if (spot.col == spotView.spot.col && spot.row == spotView.spot.row)
 
     } yield {
+      if (gameStartedSubject.gameStarted) {
+        gameStartedSubject.finishGame
+        gameWinnerSubject.finishGame(activeChip)
+      }
       spotView.blink
     }
+  }
+
+  def addGameStartedObserver(observer: Observer[GameStartedSubject]) = gameStartedSubject.addObserver(observer)
+  def addGameWinnerObserver(observer: Observer[GameWinnerSubject]) = gameWinnerSubject.addObserver(observer)
+}
+
+class GameStartedSubject extends Subject[GameStartedSubject] {
+  var gameStarted = false
+
+  protected[gui] def startGame = {
+    gameStarted = true
+    notifyObservers()
+  }
+
+  protected[gui] def finishGame = {
+    gameStarted = false
+    notifyObservers()
+  }
+
+}
+class GameWinnerSubject extends Subject[GameWinnerSubject] {
+  var gameWinner: Chip = SpaceChip
+
+  protected[gui] def finishGame(winner: Chip) = {
+    gameWinner = winner
+    notifyObservers()
   }
 
 }

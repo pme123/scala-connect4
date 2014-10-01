@@ -4,17 +4,15 @@ import javafx.event.{ActionEvent, EventHandler}
 
 import pme.connect4.util.Observer
 
-import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.Scene
+import scalafx.geometry.Insets
 import scalafx.scene.control.Button
-import scalafx.scene.layout.{AnchorPane, VBox}
-import scalafx.scene.text.Text
-import scalafx.stage.{Modality, Stage}
+import scalafx.scene.layout.AnchorPane
+import scalafx.stage.Stage
 
 /**
  * Created by pascal.mengelt on 29.09.2014.
  */
-class ControlPane(gameBoard: GameBoard) extends AnchorPane with Observer[GameBoard] {
+class ControlPane(gameBoard: GameBoard) extends AnchorPane with Observer[GameStartedSubject] {
 
   import pme.connect4.gui.GuiGameConfig._
 
@@ -52,13 +50,13 @@ class ControlPane(gameBoard: GameBoard) extends AnchorPane with Observer[GameBoa
       myDialog.close
     }
   })
-  def receiveUpdate(gameBoard: GameBoard) = {
-    changeColorButton.disable = gameBoard.gameStarted
+  def receiveUpdate(subject: GameStartedSubject) = {
+    changeColorButton.disable = subject.gameStarted
   }
 
 
   content = List(newGameButton, changeColorButton)
   margin = Insets(10, 0, 20, 0)
-  gameBoard.addObserver(this)
+  gameBoard.addGameStartedObserver(this)
 //  gameBoard.startNewGame
 }
