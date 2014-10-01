@@ -8,7 +8,7 @@ import pme.connect4.util.Subject
 
 import scalafx.animation.TranslateTransition
 import scalafx.scene.effect.InnerShadow
-import scalafx.scene.layout.Pane
+import scalafx.scene.layout.{BorderPane, Pane}
 import scalafx.scene.paint.Color
 import scalafx.scene.shape._
 import scalafx.util.Duration
@@ -17,18 +17,27 @@ import scalafx.util.Duration
 /**
  * Created by pascal.mengelt on 18.09.2014.
  */
-class GameBoard(val gameSize: (Double, Double)) extends Pane with Subject[GameBoard]{
+class GameBoard extends Pane with Subject[GameBoard]{
 
   import pme.connect4.domain.GameConfig._
   import pme.connect4.gui.ChipView._
   import pme.connect4.gui.GuiGameConfig._
 
 
-  val fourConnect = new ConnectFourGame
+  var fourConnect = new ConnectFourGame
+  var chipsToPlay:Seq[ChipView]=null
+  var gameSpots:Seq[SpotView]=null
   var activeChip: Chip = RedChip
   var gameStarted=false
 
-  val chipsToPlay: Seq[ChipView] = {
+  def startNewGame =  {
+    fourConnect = new ConnectFourGame
+    chipsToPlay = initChipsToPlay
+    gameSpots = initGameSpots
+    content = chipsToPlay ++ gameSpots
+  }
+
+  def initChipsToPlay: Seq[ChipView] = {
     for {
       col <- 0 until horFieldCount
     } yield {
@@ -53,7 +62,7 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane with Subject[GameBo
       chip
     }
   }
-  val gameSpots = {
+  def initGameSpots = {
     for {
       col <- 0 until horFieldCount
       row <- 0 until verFieldCount
@@ -84,11 +93,7 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane with Subject[GameBo
       radiusX = fieldWidth / 2 - 4 * slotMargin
       radiusY = fieldHeight / 2 - 4 * slotMargin
       fill = colorMap(chip)
-      effect = new InnerShadow {
-        offsetX = -3
-        offsetY = -3
-        radius = 12
-      }
+
     }
     chipView
   }
@@ -114,7 +119,4 @@ class GameBoard(val gameSize: (Double, Double)) extends Pane with Subject[GameBo
     }
   }
 
-  content = chipsToPlay ++ gameSpots
-
-  notifyObservers()
 }
