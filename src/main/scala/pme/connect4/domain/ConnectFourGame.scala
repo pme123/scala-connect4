@@ -15,8 +15,8 @@ class ConnectFourGame {
     game.findFirstEmpty(slotIndex)
   }
 
-  def dropChip(chip: Chip): Try[Spot] = {
-    game.dropChip(chip)
+  def nextChip(chip: Chip): Option[Spot] = {
+    game.nextChip(chip)
   }
 
   def dropChip(slotIndex: Int, chip: Chip): Try[Spot] = {
@@ -113,8 +113,8 @@ case class Game(val slots: List[Slot]) {
       }
     }
   }
-  def dropChip(chip: Chip): Try[Spot] = {
-    slots(0). dropChip(chip)
+  def nextChip(chip: Chip): Option[Spot] = {
+    slots(0). findFirstEmpty
   }
 }
 

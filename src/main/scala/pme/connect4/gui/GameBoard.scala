@@ -6,6 +6,7 @@ import javafx.scene.input.MouseEvent
 import pme.connect4.domain._
 import pme.connect4.util.{Observer, Subject}
 
+import scala.util.{Failure, Success}
 import scalafx.animation.TranslateTransition
 import scalafx.scene.layout.Pane
 import scalafx.scene.paint.Color
@@ -52,15 +53,13 @@ class GameBoard extends Pane {
           dropChipView(col)
           fourConnect.dropChip(col, activeChip)
           if (!fourConnect.hasEmptySlot(col)) chip.setVisible(false)
-          verifyTurn
-          switchPlayer
         }
       })
       chip
     }
   }
 
-  def dropChipView(col: Int) = {
+  def dropChipView(col: Int): Unit = {
     val newChip = createChip(col, fieldWidth, fieldHeight, activeChip)
     content.add(0, newChip)
     val dropHeight = rows - fourConnect.findFirstEmptySpot(col).get.row
@@ -70,6 +69,8 @@ class GameBoard extends Pane {
       byY = dropHeight * fieldHeight
     }
     transition.play()
+    verifyTurn
+    switchPlayer
   }
 
   def initGameSpots = {
@@ -108,9 +109,11 @@ class GameBoard extends Pane {
     chipView
   }
 
-  def switchPlayer = {
+  def switchPlayer : Unit = {
     activeChip = activeChip.other
-    for (chip <- chipsToPlay) chip.fill = colorMap(activeChip)
+    if (playAloneMode) {
+      if (myChip == activeChip) calcMyTurn
+    } else for (chip <- chipsToPlay) chip.fill = colorMap(activeChip)
   }
 
   def verifyTurn = {
@@ -127,7 +130,6 @@ class GameBoard extends Pane {
       if (gameStartedSubject.gameStarted) finishGame
       spotView.blink
     }
-    if (playAloneMode && myChip == activeChip) calcMyTurn
   }
 
   def startGame = {
@@ -140,8 +142,15 @@ class GameBoard extends Pane {
   }
 
   def calcMyTurn = {
-    println("My turn")
-    //  fourConnect.dropChip(myChip)
+
+    val spotOpt = fourConnect.nextChip(myChip)
+    spotOpt match {
+      case Some(spot) =>
+        fourConnect.dropChip(spot.col, myChip)
+        dropChipView(spot.col)
+      case None => // should not happen
+    }
+    println("My turn: " + spotOpt.get)
   }
 
   def finishGame = {

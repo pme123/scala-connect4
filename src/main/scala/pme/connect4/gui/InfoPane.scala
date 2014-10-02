@@ -5,7 +5,6 @@ import pme.connect4.util.Observer
 
 import scalafx.geometry.Insets
 import scalafx.scene.control.Label
-import scalafx.scene.effect.Shadow
 import scalafx.scene.layout.AnchorPane
 
 /**
