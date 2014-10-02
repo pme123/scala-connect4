@@ -40,7 +40,7 @@ class InfoPane(gameBoard: GameBoard) extends AnchorPane {
 
   private class GameWinnerObserver extends Observer[GameWinnerSubject]{
     def receiveUpdate(subject: GameWinnerSubject) = {
-      info.text = s"${info.text} \nThe winner is {$subject.gameWinner}."
+      info.text = "%s\nThe winner is %s.".format(info.text.value, subject.gameWinner.name)
     }
   }
 }

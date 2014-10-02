@@ -5,21 +5,18 @@ import javafx.event.{ActionEvent, EventHandler}
 import pme.connect4.util.Observer
 
 import scalafx.geometry.Insets
-import scalafx.scene.control.Button
-import scalafx.scene.layout.AnchorPane
+import scalafx.scene.control.{CheckBox, Button}
+import scalafx.scene.layout.{HBox, AnchorPane}
 import scalafx.stage.Stage
 
 /**
  * Created by pascal.mengelt on 29.09.2014.
  */
-class ControlPane(gameBoard: GameBoard) extends AnchorPane with Observer[GameStartedSubject] {
+class ControlPane(gameBoard: GameBoard) extends HBox with Observer[GameStartedSubject] {
 
   import pme.connect4.gui.GuiGameConfig._
 
   val newGameButton = new Button {
-    layoutX = paneOffsetX
-    minWidth = boardWidth / 2
-    prefWidth = boardWidth / 2
     text = "Start new Game"
     defaultButton = true
     onAction = new EventHandler[ActionEvent] {
@@ -30,13 +27,20 @@ class ControlPane(gameBoard: GameBoard) extends AnchorPane with Observer[GameSta
     }
   }
   val changeColorButton = new Button {
-    layoutX = paneOffsetX + boardWidth / 2
-    minWidth = boardWidth / 2
-    prefWidth = boardWidth / 2
     text = "Change Color"
     onAction = new EventHandler[ActionEvent] {
       override def handle(event: ActionEvent) {
         gameBoard.switchPlayer
+      }
+    }
+  }
+  val playAloneCheckBox:CheckBox = new CheckBox() {
+    text = "Play alone"
+    indeterminate = false
+    onAction = new EventHandler[ActionEvent] {
+      override def handle(event: ActionEvent) {
+        println(s"Play alone: " + playAloneCheckBox.isSelected)
+        gameBoard.playAlone(playAloneCheckBox.isSelected)
       }
     }
   }
@@ -50,13 +54,15 @@ class ControlPane(gameBoard: GameBoard) extends AnchorPane with Observer[GameSta
       myDialog.close
     }
   })
+
   def receiveUpdate(subject: GameStartedSubject) = {
     changeColorButton.disable = subject.gameStarted
+    playAloneCheckBox.disable = subject.gameStarted
   }
 
-
-  content = List(newGameButton, changeColorButton)
-  margin = Insets(10, 0, 20, 0)
+  content = List(newGameButton, changeColorButton, playAloneCheckBox)
+  margin = Insets(10, paneOffsetX, 20, paneOffsetX)
+  spacing = 20
   gameBoard.addGameStartedObserver(this)
 //  gameBoard.startNewGame
 }
