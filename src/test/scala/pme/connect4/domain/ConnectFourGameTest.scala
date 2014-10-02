@@ -59,7 +59,7 @@ import GameConfig._
       Given("Game")
       val game = new ConnectFourGame()
       When("Find first Empty Spot Position")
-      val emptySpot = game.findFirstEmptySlot(3)
+      val emptySpot = game.findFirstEmptySpot(3)
       Then("Then this is 0")
       assert(emptySpot.get.row === 0)
     }
@@ -67,7 +67,7 @@ import GameConfig._
       Given(" Game")
       val game = new ConnectFourGame()
       When("Find first Empty Spot Position in an invalid Slot")
-      val emptySpot = game.findFirstEmptySlot(10)
+      val emptySpot = game.findFirstEmptySpot(10)
       Then("Then this is None")
       assert(emptySpot === None)
     }

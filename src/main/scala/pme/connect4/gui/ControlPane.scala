@@ -21,7 +21,8 @@ class ControlPane(gameBoard: GameBoard) extends HBox with Observer[GameStartedSu
     defaultButton = true
     onAction = new EventHandler[ActionEvent] {
       override def handle(event: ActionEvent) {
-        changeColorButton.setDisable(false)
+        changeColorButton.disable = false
+        playAloneCheckBox.disable = false
         gameBoard.startNewGame
       }
     }

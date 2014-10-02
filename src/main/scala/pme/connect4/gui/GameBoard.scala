@@ -38,6 +38,7 @@ class GameBoard extends Pane {
     fourConnect = new ConnectFourGame
     chipsToPlay = initChipsToPlay
     gameSpots = initGameSpots
+    gameStartedSubject.gameStarted = false
     content = chipsToPlay ++ gameSpots
   }
 
@@ -48,15 +49,7 @@ class GameBoard extends Pane {
       val chip: ChipView = createChip(col, fieldWidth, fieldHeight, activeChip)
       chip.setOnMouseClicked(new EventHandler[MouseEvent] {
         override def handle(event: MouseEvent) {
-          val newChip = createChip(col, fieldWidth, fieldHeight, activeChip)
-          content.add(0, newChip)
-          val dropHeight = rows - fourConnect.findFirstEmptySlot(col).get.row
-          val transition = new TranslateTransition {
-            duration = Duration(1000)
-            node = newChip
-            byY = dropHeight * fieldHeight
-          }
-          transition.play()
+          dropChipView(col)
           fourConnect.dropChip(col, activeChip)
           if (!fourConnect.hasEmptySlot(col)) chip.setVisible(false)
           verifyTurn
@@ -65,6 +58,18 @@ class GameBoard extends Pane {
       })
       chip
     }
+  }
+
+  def dropChipView(col: Int) = {
+    val newChip = createChip(col, fieldWidth, fieldHeight, activeChip)
+    content.add(0, newChip)
+    val dropHeight = rows - fourConnect.findFirstEmptySpot(col).get.row
+    val transition = new TranslateTransition {
+      duration = Duration(1000)
+      node = newChip
+      byY = dropHeight * fieldHeight
+    }
+    transition.play()
   }
 
   def initGameSpots = {
@@ -104,13 +109,12 @@ class GameBoard extends Pane {
   }
 
   def switchPlayer = {
-    activeChip = if (activeChip == RedChip) YellowChip else RedChip
+    activeChip = activeChip.other
     for (chip <- chipsToPlay) chip.fill = colorMap(activeChip)
   }
 
   def verifyTurn = {
     if (!gameStartedSubject.gameStarted) startGame
-    if (playAloneMode) println("My turn")
     val winners = fourConnect.winningSpots(activeChip)
 
     for {
@@ -123,21 +127,31 @@ class GameBoard extends Pane {
       if (gameStartedSubject.gameStarted) finishGame
       spotView.blink
     }
+    if (playAloneMode && myChip == activeChip) calcMyTurn
   }
-  def startGame ={
+
+  def startGame = {
     gameStartedSubject.startGame
-    if(playAloneMode)
+    if (playAloneMode) myChip = activeChip.other
   }
+
   def playAlone(playAlone: Boolean) = {
     playAloneMode = playAlone
   }
 
+  def calcMyTurn = {
+    println("My turn")
+    //  fourConnect.dropChip(myChip)
+  }
+
   def finishGame = {
-    chipsToPlay.foreach(chipView => chipView.visible=false)
+    chipsToPlay.foreach(chipView => chipView.visible = false)
     gameStartedSubject.finishGame
     gameWinnerSubject.finishGame(activeChip)
   }
+
   def addGameStartedObserver(observer: Observer[GameStartedSubject]) = gameStartedSubject.addObserver(observer)
+
   def addGameWinnerObserver(observer: Observer[GameWinnerSubject]) = gameWinnerSubject.addObserver(observer)
 }
 
@@ -155,6 +169,7 @@ class GameStartedSubject extends Subject[GameStartedSubject] {
   }
 
 }
+
 class GameWinnerSubject extends Subject[GameWinnerSubject] {
   var gameWinner: Chip = SpaceChip
 

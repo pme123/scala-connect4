@@ -11,8 +11,12 @@ class ConnectFourGame {
 
   val game = Game(cols, rows)
 
-  def findFirstEmptySlot(slotIndex: Int): Option[Spot] = {
+  def findFirstEmptySpot(slotIndex: Int): Option[Spot] = {
     game.findFirstEmpty(slotIndex)
+  }
+
+  def dropChip(chip: Chip): Try[Spot] = {
+    game.dropChip(chip)
   }
 
   def dropChip(slotIndex: Int, chip: Chip): Try[Spot] = {
@@ -109,7 +113,9 @@ case class Game(val slots: List[Slot]) {
       }
     }
   }
-
+  def dropChip(chip: Chip): Try[Spot] = {
+    slots(0). dropChip(chip)
+  }
 }
 
 object Slot {
@@ -148,21 +154,25 @@ case class Spot(chip: Chip, col: Int, row: Int) {
 
 sealed abstract class Chip {
   def name:String
+  def other: Chip
 }
 
 case object SpaceChip extends Chip {
   override def toString = "[ ]"
   def name = "Space"
+  def other= SpaceChip
 }
 
 case object RedChip extends Chip {
   override def toString = "[r]"
   def name = "Red"
+  def other= YellowChip
 }
 
 case object YellowChip extends Chip {
   override def toString = "[y]"
   def name = "Yellow"
+  def other = RedChip
 }
 
 
