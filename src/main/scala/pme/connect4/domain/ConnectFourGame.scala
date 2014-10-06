@@ -1,6 +1,6 @@
 package pme.connect4.domain
 
-import pme.connect4.domain.Game.{WinDirection, Winner, _}
+import pme.connect4.domain.Game.Winner
 import pme.connect4.domain.GameConfig._
 
 import scala.collection.immutable.::
@@ -104,7 +104,7 @@ case class Game(val slots: List[Slot]) {
 
     if (matchedSpots isEmpty) Nil
     else {
-     for {
+      for {
         matchedSpot <- matchedSpots
         nextAttemptOpt <- nextAttempts(matchedSpot)
         nextAttempt <- nextAttemptOpt
@@ -113,8 +113,9 @@ case class Game(val slots: List[Slot]) {
       }
     }
   }
+
   def nextChip(chip: Chip): Option[Spot] = {
-    slots(0). findFirstEmpty
+    slots(0).findFirstEmpty
   }
 }
 
@@ -152,28 +153,7 @@ case class Spot(chip: Chip, col: Int, row: Int) {
 }
 
 
-sealed abstract class Chip {
-  def name:String
-  def other: Chip
-}
 
-case object SpaceChip extends Chip {
-  override def toString = "[ ]"
-  def name = "Space"
-  def other= SpaceChip
-}
-
-case object RedChip extends Chip {
-  override def toString = "[r]"
-  def name = "Red"
-  def other= YellowChip
-}
-
-case object YellowChip extends Chip {
-  override def toString = "[y]"
-  def name = "Yellow"
-  def other = RedChip
-}
 
 
 
