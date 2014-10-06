@@ -50,7 +50,8 @@ import pme.connect4.domain.GameConfig._
       }yield{ neighbor.chip match {
         case SpaceChip => points+=pointsForHorSpace
         case neighborChip if neighborChip == chip  => points+=pointsForHorMatch
-        case _ => points=0
+        case _ => if (col-minSlot < winningChips) points=0
+
       }}
         points
     }
