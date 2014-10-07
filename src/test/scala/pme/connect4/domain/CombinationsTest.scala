@@ -107,11 +107,20 @@ import Combinations._
     scenario("Third row on a new Game.") {
       Given("A game with 2 other Chips")
       val game: Game = Game(cols, rows)
+      for (i <- 0 to 1) game.dropChip(i, YellowChip)
+      When("Evaluate the points for the first Slot(2)")
+      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(2).get)
+      Then("It should deliver 0")
+      assert(slotPoints === 0)
+    }
+    scenario("Third row on a new Game with SpaceChips on either side.") {
+      Given("A game with 2 other Chips")
+      val game: Game = Game(cols, rows)
       for (i <- 1 to 2) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(0)")
       val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(0).get)
-      Then("It should deliver 0")
-      assert(slotPoints === 0)
+      Then("It should deliver max. points")
+      assert(slotPoints === pointsMax)
     }
     scenario("Fourth row on a new Game.") {
       Given("A game with 3 other Chips")
@@ -122,6 +131,7 @@ import Combinations._
       Then("It should deliver max. points")
       assert(slotPoints === pointsMax)
     }
+
   }
 
   feature("Evaluate the points for the Vertical defence Combinator") {

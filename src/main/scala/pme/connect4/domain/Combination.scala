@@ -74,17 +74,27 @@ object Combinations {
   val horDefence = new HorCombination {
 
     def eval(game: Game, chip: Chip, spot: Spot): Int = {
-      println("minSlot(spot): "+minSlot(spot))
-      println("maxSlot(spot): "+maxSlot(spot))
+      println("minSlot(spot): " + minSlot(spot))
+      println("maxSlot(spot): " + maxSlot(spot))
       val neighbors = for {
-        attempt <- minSlot(spot) to maxSlot(spot)-winningChips
-        col <- attempt until attempt+winningChips
+        attempt <- minSlot(spot) to maxSlot(spot) - winningChips
+        col <- attempt until attempt + winningChips
         neighbor = game.slots(col).spots(spot.row)
-        if(neighbor.chip == chip.other)
-      } yield { (attempt, neighbor) }
+        if (neighbor.chip != chip)
+      } yield {
+        (attempt, neighbor)
+      }
 
-     val filterredNeighbors =  neighbors.groupBy(neighbor => neighbor._1).filter(neighborSeq => neighborSeq._2.length==winningChips-1)
-      if(filterredNeighbors.size>0) pointsMax else 0
+      if ((for {
+        attempts <- neighbors.groupBy(neighbor => neighbor._1)
+        attempt<-attempts._2
+        if(attempts._2.length == winningChips)
+        if(attempts._2.count(entry => entry._2.chip == chip.other) >= winningChips - 2)
+      } yield {
+        attempts._2
+      }).isEmpty)
+        0
+      else pointsMax
     }
   }
   val vertDefence = new Combination {
