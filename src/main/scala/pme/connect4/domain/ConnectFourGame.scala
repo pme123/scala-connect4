@@ -2,6 +2,7 @@ package pme.connect4.domain
 
 import pme.connect4.domain.Game.Winner
 import pme.connect4.domain.GameConfig._
+import Combinations._
 
 import scala.collection.immutable.::
 import scala.util.{Failure, Success, Try}
@@ -14,8 +15,11 @@ class ConnectFourGame {
   def findFirstEmptySpot(slotIndex: Int): Option[Spot] = {
     game.findFirstEmpty(slotIndex)
   }
+  def findFirstTakenSpot(slotIndex: Int): Option[Spot] = {
+    game.findFirstTaken(slotIndex)
+  }
 
-  def nextChip(chip: Chip): Option[Spot] = {
+  def nextChip(chip: Chip): Int = {
     game.nextChip(chip)
   }
 
@@ -66,6 +70,11 @@ case class Game(val slots: List[Slot]) {
       slots(slotIndex).findFirstEmpty
     } else None
   }
+  def findFirstTaken(slotIndex: Int): Option[Spot] = {
+    if (slotIndex < slots.length) {
+      slots(slotIndex).findFirstTaken
+    } else None
+  }
 
   def dropChip(slotIndex: Int, chip: Chip): Try[Spot] = {
     slots(slotIndex).dropChip(chip)
@@ -114,8 +123,8 @@ case class Game(val slots: List[Slot]) {
     }
   }
 
-  def nextChip(chip: Chip): Option[Spot] = {
-    slots(0).findFirstEmpty
+  def nextChip(chip: Chip): Int = {
+    evalBestMove(this, chip)
   }
 }
 
@@ -134,6 +143,9 @@ case class Slot(val col: Int, pSpots: List[Spot]) {
 
   def findFirstEmpty: Option[Spot] = {
     spots.filter(spot => spot.chip == SpaceChip).headOption
+  }
+  def findFirstTaken: Option[Spot] = {
+    spots.filter(spot => spot.chip != SpaceChip).lastOption
   }
 
   def dropChip(chip: Chip): Try[Spot] = {

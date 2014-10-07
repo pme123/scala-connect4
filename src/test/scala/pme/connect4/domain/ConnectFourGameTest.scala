@@ -96,6 +96,27 @@ import GameConfig._
 
   }
 
+  feature("Find first taken Spot in Game") {
+    scenario("No taken Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame()
+      When("Find first taken Spot Position, where there is none.")
+      val takenSpot = game.findFirstTakenSpot(3)
+      Then("Then this is None")
+      assert(takenSpot === None)
+    }
+    scenario("Correct Spot") {
+      Given("Game with a Chip")
+      val game = new ConnectFourGame()
+      game.dropChip(3, RedChip)
+      When("Find first taken Spot Position")
+      val takenSpot = game.findFirstTakenSpot(3)
+      Then("Then this is on row 0")
+      assert(takenSpot.get.row === 0)
+    }
+
+  }
+
   feature("Drop the Chip in a Slot") {
     scenario("In a Slot with a Spot left") {
       Given("new Game")

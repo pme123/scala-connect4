@@ -6,7 +6,6 @@ import javafx.scene.input.MouseEvent
 import pme.connect4.domain._
 import pme.connect4.util.{Observer, Subject}
 
-import scala.util.{Failure, Success}
 import scalafx.animation.TranslateTransition
 import scalafx.scene.layout.Pane
 import scalafx.scene.paint.Color
@@ -50,8 +49,8 @@ class GameBoard extends Pane {
       val chip: ChipView = createChip(col, fieldWidth, fieldHeight, activeChip)
       chip.setOnMouseClicked(new EventHandler[MouseEvent] {
         override def handle(event: MouseEvent) {
-          dropChipView(col)
           fourConnect.dropChip(col, activeChip)
+          dropChipView(col)
           if (!fourConnect.hasEmptySlot(col)) chip.setVisible(false)
         }
       })
@@ -62,7 +61,7 @@ class GameBoard extends Pane {
   def dropChipView(col: Int): Unit = {
     val newChip = createChip(col, fieldWidth, fieldHeight, activeChip)
     content.add(0, newChip)
-    val dropHeight = rows - fourConnect.findFirstEmptySpot(col).get.row
+    val dropHeight = rows - fourConnect.findFirstTakenSpot(col).get.row
     val transition = new TranslateTransition {
       duration = Duration(1000)
       node = newChip
@@ -71,6 +70,7 @@ class GameBoard extends Pane {
     transition.play()
     verifyTurn
     switchPlayer
+     runNextTurn
   }
 
   def initGameSpots = {
@@ -109,11 +109,15 @@ class GameBoard extends Pane {
     chipView
   }
 
-  def switchPlayer : Unit = {
+  def switchPlayer: Unit = {
     activeChip = activeChip.other
-    if (playAloneMode) {
+    for (chip <- chipsToPlay) chip.fill = colorMap(activeChip)
+  }
+
+  def runNextTurn = {
+    if (!gameWinnerSubject.isFinish && playAloneMode) {
       if (myChip == activeChip) calcMyTurn
-    } else for (chip <- chipsToPlay) chip.fill = colorMap(activeChip)
+    }
   }
 
   def verifyTurn = {
@@ -134,6 +138,7 @@ class GameBoard extends Pane {
 
   def startGame = {
     gameStartedSubject.startGame
+    gameWinnerSubject.startGame
     if (playAloneMode) myChip = activeChip.other
   }
 
@@ -143,14 +148,10 @@ class GameBoard extends Pane {
 
   def calcMyTurn = {
 
-    val spotOpt = fourConnect.nextChip(myChip)
-    spotOpt match {
-      case Some(spot) =>
-        fourConnect.dropChip(spot.col, myChip)
-        dropChipView(spot.col)
-      case None => // should not happen
-    }
-    println("My turn: " + spotOpt.get)
+    val col = fourConnect.nextChip(myChip)
+    fourConnect.dropChip(col, myChip)
+    dropChipView(col)
+    println("My turn: " + col)
   }
 
   def finishGame = {
@@ -182,6 +183,10 @@ class GameStartedSubject extends Subject[GameStartedSubject] {
 class GameWinnerSubject extends Subject[GameWinnerSubject] {
   var gameWinner: Chip = SpaceChip
 
+  protected[gui] def isFinish = gameWinner != SpaceChip
+  protected[gui] def startGame = {
+    gameWinner = SpaceChip
+  }
   protected[gui] def finishGame(winner: Chip) = {
     gameWinner = winner
     notifyObservers()
