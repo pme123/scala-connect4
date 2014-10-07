@@ -87,9 +87,18 @@ object Combinations {
 
       if ((for {
         attempts <- neighbors.groupBy(neighbor => neighbor._1)
-        attempt<-attempts._2
-        if(attempts._2.length == winningChips)
-        if(attempts._2.count(entry => entry._2.chip == chip.other) >= winningChips - 2)
+        attempt <- attempts._2
+        if (attempts._2.length == winningChips)
+        if {
+          val count = attempts._2.count(entry => entry._2.chip == chip.other)
+          count >= winningChips - 1 ||
+            count >= winningChips - 2 && attempts._2.filter(attempt =>
+          attempt._2.chip!=SpaceChip).exists {
+              attempt =>
+                val col = attempt._2.col
+               col != 0 && col != cols
+            }
+        }
       } yield {
         attempts._2
       }).isEmpty)
