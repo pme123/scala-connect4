@@ -122,16 +122,46 @@ import Combinations._
       Then("It should deliver max. points")
       assert(slotPoints === pointsMax)
     }
-    scenario("4. col on a new Game.") {
+    scenario("4. col on a Game.") {
       Given("A game with 3 other Chips")
       val game: Game = Game(cols, rows)
-      for (i <- 1 to 3) game.dropChip(i, YellowChip)
-      When("Evaluate the points for the first Slot(0)")
-      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(0).get)
+      for (i <- 0 to 2) game.dropChip(i, YellowChip)
+      When("Evaluate the points for the first Slot(3)")
+      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(3).get)
       Then("It should deliver max. points")
       assert(slotPoints === pointsMax)
     }
 
+    scenario("4. col on a Game (between).") {
+      Given("A game with 3 other Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(3, YellowChip)
+      for (i <- 0 to 1) game.dropChip(i, YellowChip)
+      When("Evaluate the points for the first Slot(2)")
+      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(2).get)
+      Then("It should deliver max. points")
+      assert(slotPoints === pointsMax)
+    }
+    scenario("4. col on a Game next to.") {
+      Given("A game with 3 other Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(3, YellowChip)
+      for (i <- 0 to 1) game.dropChip(i, YellowChip)
+      When("Evaluate the points for the Slot(4)")
+      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(4).get)
+      Then("It should deliver 0")
+      assert(slotPoints === 0)
+    }
+    scenario("5. col on a Game next to.") {
+      Given("A game with 3 other Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(4, YellowChip)
+      for (i <- 1 to 2) game.dropChip(i, YellowChip)
+      When("Evaluate the points for the Slot(5)")
+      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(5).get)
+      Then("It should deliver 0")
+      assert(slotPoints === 0)
+    }
   }
 
   feature("Evaluate the points for the Vertical defence Combinator") {

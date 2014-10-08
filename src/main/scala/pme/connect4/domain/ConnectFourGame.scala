@@ -65,6 +65,14 @@ case class Game(val slots: List[Slot]) {
 
   override def toString = (for (slot <- slots) yield (slot.toString)).mkString("\n")
 
+  def findSpot(col:Int,row:Int) = {
+    validateSpot(col, row)
+    slots(col).findSpot(row)
+  }
+  def validateSpot(col:Int,row:Int): Unit =
+    if(col < 0 || col >= cols  || row < 0 || row >= rows)
+      throw new IllegalArgumentException
+
   def findFirstEmpty(slotIndex: Int): Option[Spot] = {
     if (slotIndex < slots.length) {
       slots(slotIndex).findFirstEmpty
@@ -140,6 +148,10 @@ case class Slot(val col: Int, pSpots: List[Spot]) {
   var spots = pSpots
 
   override def toString = spots.mkString(",")
+
+  def findSpot(row:Int) = {
+    spots(row)
+  }
 
   def findFirstEmpty: Option[Spot] = {
     spots.filter(spot => spot.chip == SpaceChip).headOption

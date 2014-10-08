@@ -84,6 +84,22 @@ object Combinations {
       } yield {
         (attempt, neighbor)
       }
+      def hasNoChipsOnEdge(attempts: (Int, IndexedSeq[(Int, Spot)])): Boolean = {
+        val filterred = attempts._2.filter(attempt =>
+          attempt._2.chip != SpaceChip)
+        val exists = filterred.exists {
+          attempt =>
+            val col = attempt._2.col
+            val row = attempt._2.row
+            (
+              col == 0
+                || col == cols
+                || (col == 1 && game.findSpot(col - 1, row).chip == chip.other)
+                || (col == cols-1 && game.findSpot(col + 1, row).chip == chip.other)
+              )
+        }
+        !exists
+      }
 
 
       if ((for {
@@ -99,18 +115,11 @@ object Combinations {
       }).isEmpty)
         0
       else pointsMax
+
+
     }
 
-    def hasNoChipsOnEdge(attempts: (Int, IndexedSeq[(Int, Spot)])): Boolean = {
-      val filterred = attempts._2.filter(attempt =>
-        attempt._2.chip != SpaceChip)
-      val exists = filterred.exists {
-        attempt =>
-          val col = attempt._2.col
-          col == 0 || col == cols
-      }
-      !exists
-    }
+
   }
   val vertDefence = new Combination {
 
