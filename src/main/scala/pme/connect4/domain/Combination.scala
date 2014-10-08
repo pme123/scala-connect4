@@ -29,12 +29,12 @@ object Combinations {
       }).sum
     }
 
-    val pointsForSlots: List[(Int, Spot)] = (for {
+    val pointsForSlots: List[(Int, Spot)] = for {
       slot <- game.slots
       spot <- slot.findFirstEmpty
     } yield {
       evalPointsForSlot(spot) -> spot
-    })
+    }
     val chosenSpot = pointsForSlots.foldLeft((0, None: Option[Spot]))((a, b) => if (a._1 < b._1) (b._1, Some(b._2)) else a)
     println(s"chosenSpot: $chosenSpot")
     chosenSpot._2 match {
@@ -59,13 +59,13 @@ object Combinations {
       } yield {
         neighbor.chip match {
           case SpaceChip => game.findFirstEmpty(col) match {
-            case Some(neighbor: Spot) if (neighbor.row == spot.row) => points += pointsForHorSpace
+            case Some(neighbor: Spot) if neighbor.row == spot.row => points += pointsForHorSpace
             case Some(neighbor: Spot) => points += pointsForHorSpace / 2
             case None => throw new IllegalArgumentException
           }
           case neighborChip if neighborChip == chip => points += pointsForHorMatch
           case _ => if (col - minSlot < winningChips) points = 0
-            if (maxSlot - col < winningChips) break
+            if (maxSlot - col < winningChips) break()
         }
       })
       points
@@ -80,7 +80,7 @@ object Combinations {
         attempt <- minSlot(spot) to maxSlot(spot) - winningChips
         col <- attempt until attempt + winningChips
         neighbor = game.slots(col).spots(spot.row)
-        if (neighbor.chip != chip)
+        if neighbor.chip != chip
       } yield {
         (attempt, neighbor)
       }
@@ -88,7 +88,7 @@ object Combinations {
 
       if ((for {
         attempts <- neighbors.groupBy(neighbor => neighbor._1)
-        if (attempts._2.length == winningChips)
+        if attempts._2.length == winningChips
         if {
           val count = attempts._2.count(entry => entry._2.chip == chip.other)
           count >= winningChips - 1 ||
@@ -121,7 +121,7 @@ object Combinations {
         neighbor = game.slots(spot.col).spots(row)
 
       } yield {
-        if (neighbor.chip == chip.other) count += 1 else break
+        if (neighbor.chip == chip.other) count += 1 else break()
       })
       if (winningChips - count == 1) pointsMax else 0
     }
