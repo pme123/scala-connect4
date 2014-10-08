@@ -2,6 +2,7 @@ package pme.connect4.domain
 
 import pme.connect4.domain.GameConfig._
 
+import scala.collection.immutable.IndexedSeq
 import scala.util.control.Breaks._
 
 object Combination {
@@ -74,8 +75,7 @@ object Combinations {
   val horDefence = new HorCombination {
 
     def eval(game: Game, chip: Chip, spot: Spot): Int = {
-      println("minSlot(spot): " + minSlot(spot))
-      println("maxSlot(spot): " + maxSlot(spot))
+
       val neighbors = for {
         attempt <- minSlot(spot) to maxSlot(spot) - winningChips
         col <- attempt until attempt + winningChips
@@ -85,25 +85,31 @@ object Combinations {
         (attempt, neighbor)
       }
 
+
       if ((for {
         attempts <- neighbors.groupBy(neighbor => neighbor._1)
-        attempt <- attempts._2
         if (attempts._2.length == winningChips)
         if {
           val count = attempts._2.count(entry => entry._2.chip == chip.other)
           count >= winningChips - 1 ||
-            count >= winningChips - 2 && attempts._2.filter(attempt =>
-          attempt._2.chip!=SpaceChip).exists {
-              attempt =>
-                val col = attempt._2.col
-               col != 0 && col != cols
-            }
+            count >= winningChips - 2 && hasNoChipsOnEdge(attempts)
         }
       } yield {
         attempts._2
       }).isEmpty)
         0
       else pointsMax
+    }
+
+    def hasNoChipsOnEdge(attempts: (Int, IndexedSeq[(Int, Spot)])): Boolean = {
+      val filterred = attempts._2.filter(attempt =>
+        attempt._2.chip != SpaceChip)
+      val exists = filterred.exists {
+        attempt =>
+          val col = attempt._2.col
+          col == 0 || col == cols
+      }
+      !exists
     }
   }
   val vertDefence = new Combination {
