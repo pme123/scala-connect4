@@ -24,7 +24,7 @@ import Combinations._
       Given("A new game")
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
-      val slotPoints = horWin.eval(game, RedChip, game.findFirstEmpty(0).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horWin.eval
       Then("It should deliver 4 times the pointsForHorSpace")
       assert(slotPoints === 4*pointsForHorSpace )
     }
@@ -32,7 +32,7 @@ import Combinations._
       Given("A new game")
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(6)")
-      val slotPoints = horWin.eval(game, RedChip, game.findFirstEmpty(6).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(6).get).horWin.eval
       Then("It should deliver 4 times the pointsForHorSpace")
       assert(slotPoints === 4*pointsForHorSpace )
     }
@@ -40,7 +40,7 @@ import Combinations._
       Given("A new game")
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(2)")
-      val slotPoints = horWin.eval(game, RedChip, game.findFirstEmpty(2).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(2).get).horWin.eval
       Then("It should deliver (2+4) times the pointsForHorSpace")
       assert(slotPoints === (2+4)*pointsForHorSpace )
     }
@@ -50,7 +50,7 @@ import Combinations._
       val game: Game = Game(cols, rows)
       game.dropChip(3, RedChip)
       When("Evaluate the points for the first Slot(0)")
-      val slotPoints = horWin.eval(game, RedChip, game.findFirstEmpty(0).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horWin.eval
       Then("It should deliver 3 times the pointsForHorSpace and 1 pointsForHorMatch")
       assert(slotPoints === 3*pointsForHorSpace+1*pointsForHorMatch )
     }
@@ -60,7 +60,7 @@ import Combinations._
       val game: Game = Game(cols, rows)
       game.dropChip(3, YellowChip)
       When("Evaluate the points for the first Slot(0)")
-      val slotPoints = horWin.eval(game, RedChip, game.findFirstEmpty(0).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horWin.eval
       Then("It should deliver 0 (not four slots in a row")
       assert(slotPoints === 0 )
     }
@@ -69,7 +69,7 @@ import Combinations._
       val game: Game = Game(cols, rows)
       game.dropChip(4, YellowChip)
       When("Evaluate the points for the first Slot(3)")
-      val slotPoints = horWin.eval(game, RedChip, game.findFirstEmpty(3).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(3).get).horWin.eval
       Then("It should deliver 4 times the pointsForHorSpace")
       assert(slotPoints === 4*pointsForHorSpace )
     }
@@ -79,7 +79,7 @@ import Combinations._
       val game: Game = Game(cols, rows)
       for (i <- 0 until 2) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(0)")
-      val slotPoints = horWin.eval(game, RedChip, game.findFirstEmpty(0).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horWin.eval
       Then("It should deliver 3 for pointsForHorSpace (2 + 2*0.5)")
       assert(slotPoints === 3*pointsForHorSpace )
     }
@@ -89,7 +89,19 @@ import Combinations._
       game.dropChip(0, YellowChip)
       game.dropChip(2, YellowChip)
       When("Evaluate the points for the first Slot(1)")
-      val slotPoints = horWin.eval(game, RedChip, game.findFirstEmpty(1).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(1).get).horWin.eval
+      Then("It should deliver 0")
+      assert(slotPoints === 0 )
+    }
+    scenario("Space is between 2 Chips. If only one left.") {
+      Given("A game with 2 Chips and another Chip.")
+      val game: Game = Game(cols, rows)
+      game.dropChip(0, RedChip)
+      game.dropChip(1, YellowChip)
+      game.dropChip(3, YellowChip)
+      game.dropChip(4, RedChip)
+      When("Evaluate the points for the first Slot(2)")
+      val slotPoints = new AllCombinations(game, YellowChip, game.findFirstEmpty(2).get).horWin.eval
       Then("It should deliver 0")
       assert(slotPoints === 0 )
     }
@@ -100,7 +112,7 @@ import Combinations._
       Given("A new game")
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
-      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(0).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horDefence.eval
       Then("It should deliver 0")
       assert(slotPoints === 0)
     }
@@ -109,7 +121,7 @@ import Combinations._
       val game: Game = Game(cols, rows)
       for (i <- 0 to 1) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(2)")
-      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(2).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(2).get).horDefence.eval
       Then("It should deliver 0")
       assert(slotPoints === 0)
     }
@@ -118,18 +130,18 @@ import Combinations._
       val game: Game = Game(cols, rows)
       for (i <- 1 to 2) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(3)")
-      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(3).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(3).get).horDefence.eval
       Then("It should deliver max. points")
-      assert(slotPoints === pointsMax)
+      assert(slotPoints === pointsMax*2)
     }
     scenario("4. col on a Game.") {
       Given("A game with 3 other Chips")
       val game: Game = Game(cols, rows)
       for (i <- 0 to 2) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(3)")
-      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(3).get)
-      Then("It should deliver max. points")
-      assert(slotPoints === pointsMax)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(3).get).horDefence.eval
+      Then("It should deliver max. points *3")
+      assert(slotPoints === pointsMax*3)
     }
 
     scenario("4. col on a Game (between).") {
@@ -138,19 +150,19 @@ import Combinations._
       game.dropChip(3, YellowChip)
       for (i <- 0 to 1) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(2)")
-      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(2).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(2).get).horDefence.eval
       Then("It should deliver max. points")
-      assert(slotPoints === pointsMax)
+      assert(slotPoints === pointsMax*3)
     }
     scenario("4. col on a Game next to.") {
       Given("A game with 3 other Chips")
       val game: Game = Game(cols, rows)
-      game.dropChip(3, YellowChip)
-      for (i <- 0 to 1) game.dropChip(i, YellowChip)
+      game.dropChip(0, YellowChip)
+      for (i <- 2 to 3) game.dropChip(i, YellowChip)
       When("Evaluate the points for the Slot(4)")
-      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(4).get)
-      Then("It should deliver 0")
-      assert(slotPoints === 0)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(4).get).horDefence.eval
+      Then("It should deliver pointsMax*2")
+      assert(slotPoints === pointsMax*2)
     }
     scenario("5. col on a Game next to.") {
       Given("A game with 3 other Chips")
@@ -158,7 +170,7 @@ import Combinations._
       game.dropChip(4, YellowChip)
       for (i <- 1 to 2) game.dropChip(i, YellowChip)
       When("Evaluate the points for the Slot(5)")
-      val slotPoints = horDefence.eval(game, RedChip, game.findFirstEmpty(5).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(5).get).horDefence.eval
       Then("It should deliver 0")
       assert(slotPoints === 0)
     }
@@ -169,7 +181,7 @@ import Combinations._
       Given("A new game")
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
-      val slotPoints = vertDefence.eval(game, RedChip, game.findFirstEmpty(0).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertDefence.eval
       Then("It should deliver 0")
       assert(slotPoints === 0)
     }
@@ -178,7 +190,7 @@ import Combinations._
       val game: Game = Game(cols, rows)
       for (i <- 0 until 2) game.dropChip(0, YellowChip)
       When("Evaluate the points for the first Slot(0)")
-      val slotPoints = vertDefence.eval(game, RedChip, game.findFirstEmpty(0).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertDefence.eval
       Then("It should deliver 0")
       assert(slotPoints === 0)
     }
@@ -187,7 +199,7 @@ import Combinations._
       val game: Game = Game(cols, rows)
       for (i <- 0 until 3) game.dropChip(0, YellowChip)
       When("Evaluate the points for the first Slot(0)")
-      val slotPoints = vertDefence.eval(game, RedChip, game.findFirstEmpty(0).get)
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertDefence.eval
       Then("It should deliver max. points")
       assert(slotPoints === pointsMax)
     }
