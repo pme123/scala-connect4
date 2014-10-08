@@ -68,7 +68,7 @@ case class AllCombinations(game: Game, activeChip: Chip, spot: Spot) {
           })
           points*/
 
-          var maxSpaceCount = 0
+          var maxCount : (Int, Int) = (0,0)
           var maxMatchCount = 0
           for {
             attempts <- neighbors.groupBy(neighbor => neighbor._1)
@@ -77,14 +77,14 @@ case class AllCombinations(game: Game, activeChip: Chip, spot: Spot) {
               exists
             })*/
             if attempts._2.length == winningChips
+          //  countBorder = attempts._2.head._2.
             countChips = attempts._2.count(entry => entry._2.chip == activeChip)
             countSpace = attempts._2.count(entry => entry._2.chip == SpaceChip)
           } {
-            maxSpaceCount = countSpace max maxSpaceCount
-            maxMatchCount = countChips max maxMatchCount
+            maxCount = (countSpace max maxCount._1, countChips max maxCount._2)
           }
 
-          pointsForHorMatch * maxMatchCount + pointsForHorSpace *maxSpaceCount
+           pointsForHorSpace * maxCount._1 + pointsForHorMatch * maxCount._2
         }
       }
       lazy val horDefence = new HorCombination {
