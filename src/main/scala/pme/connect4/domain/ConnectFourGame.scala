@@ -1,6 +1,5 @@
 package pme.connect4.domain
 
-import pme.connect4.domain.Combinations._
 import pme.connect4.domain.Game.Winner
 import pme.connect4.domain.GameConfig._
 
@@ -18,10 +17,6 @@ class ConnectFourGame {
 
   def findFirstTakenSpot(slotIndex: Int): Option[Spot] = {
     game.findFirstTaken(slotIndex)
-  }
-
-  def nextChip(chip: Chip): Int = {
-    game.nextChip(chip)
   }
 
   def dropChip(slotIndex: Int, chip: Chip): Try[Spot] = {
@@ -61,6 +56,8 @@ object Game {
 }
 
 case class Game(slots: List[Slot]) {
+
+
 
   case class Attempt(offset: (Int, Int), spots: List[Spot])
 
@@ -103,6 +100,18 @@ case class Game(slots: List[Slot]) {
     if (slotIndex < slots.length) {
       slots(slotIndex).findFirstTaken
     } else None
+  }
+  def countSpaceBefore(spot: Spot):Int = {
+    findSpotInRowBefore(spot) match {
+      case Some(newSpot) if newSpot.chip == SpaceChip =>  1 + countSpaceBefore(newSpot)
+      case _ =>0
+    }
+  }
+  def countSpaceAfter(spot: Spot):Int = {
+    findSpotInRowAfter(spot) match {
+      case Some(newSpot) if newSpot.chip == SpaceChip =>  1 + countSpaceAfter(newSpot)
+      case _ =>0
+    }
   }
 
   def dropChip(slotIndex: Int, chip: Chip): Try[Spot] = {
@@ -152,9 +161,7 @@ case class Game(slots: List[Slot]) {
     }
   }
 
-  def nextChip(chip: Chip): Int = {
-    evalBestMove(this, chip)
-  }
+
 }
 
 object Slot {

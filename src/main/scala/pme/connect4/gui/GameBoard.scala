@@ -148,7 +148,7 @@ class GameBoard extends Pane {
 
   def calcMyTurn = {
 
-    val col = fourConnect.nextChip(myChip)
+    val col = Combinations.evalBestMove(fourConnect.game,myChip)
     fourConnect.dropChip(col, myChip)
     dropChipView(col)
     println("My turn: " + col)

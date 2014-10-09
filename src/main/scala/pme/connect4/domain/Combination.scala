@@ -68,23 +68,25 @@ case class AllCombinations(game: Game, activeChip: Chip, spot: Spot) {
           })
           points*/
 
-          var maxCount : (Int, Int) = (0,0)
+          var maxCount =0
           var maxMatchCount = 0
           for {
             attempts <- neighbors.groupBy(neighbor => neighbor._1)
-       /*   .filter(neighbor => {
+          .filter(neighbor => {
               val exists = !neighbor._2.exists(spotEntry => spotEntry._2.chip == activeChip.other)
               exists
-            })*/
+            })
             if attempts._2.length == winningChips
-          //  countBorder = attempts._2.head._2.
-            countChips = attempts._2.count(entry => entry._2.chip == activeChip)
-            countSpace = attempts._2.count(entry => entry._2.chip == SpaceChip)
+
+              countChips = attempts._2.count(entry => entry._2.chip == activeChip)
+            countSpace = attempts._2.count(entry => entry._2.chip == SpaceChip && (for (belowSpot <- game.findSpotInColBelow(entry._2); if(belowSpot.chip == SpaceChip) )yield belowSpot).isEmpty)
+            countBeforeBorder = 1 min game.countSpaceBefore(attempts._2.head._2)
+            countAfterBorder = 1 min game.countSpaceAfter(attempts._2.last._2)
           } {
-            maxCount = (countSpace max maxCount._1, countChips max maxCount._2)
+            maxCount = maxCount max( pointsForHorSpace * countSpace + pointsForHorMatch * countChips + countBeforeBorder+ countAfterBorder)
           }
 
-           pointsForHorSpace * maxCount._1 + pointsForHorMatch * maxCount._2
+           maxCount
         }
       }
       lazy val horDefence = new HorCombination {
@@ -99,8 +101,8 @@ case class AllCombinations(game: Game, activeChip: Chip, spot: Spot) {
                 val result = (
                   col == 0
                     || col == cols
-                    || (col == attempts._2(0)._2.col && game.findSpot(col - 1, row).chip == activeChip.other)
-                    || (col == attempts._2(attempts._2.size - 1)._2.col && game.findSpot(col + 1, row).chip == activeChip.other)
+                    || (col == attempts._2(0)._2.col && game.retrieveSpot(col - 1, row).chip == activeChip.other)
+                    || (col == attempts._2(attempts._2.size - 1)._2.col && game.retrieveSpot(col + 1, row).chip == activeChip.other)
                   )
                 result
             }
@@ -148,7 +150,7 @@ case class AllCombinations(game: Game, activeChip: Chip, spot: Spot) {
           attempt <- minSlot(spot) to maxSlot(spot) - winningChips
           col <- attempt until attempt + winningChips
           neighbor = game.slots(col).spots(spot.row)
-          if neighbor.chip != activeChip
+         // if neighbor.chip != activeChip
         } yield {
           (attempt, neighbor)
         }

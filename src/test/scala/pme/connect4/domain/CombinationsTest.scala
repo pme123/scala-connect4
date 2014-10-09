@@ -25,24 +25,24 @@ import Combinations._
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
       val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horWin.eval
-      Then("It should deliver 4 times the pointsForHorSpace")
-      assert(slotPoints === 4*pointsForHorSpace )
+      Then("It should deliver 4 times the pointsForHorSpace and one border")
+      assert(slotPoints === 4*pointsForHorSpace + 1 )
     }
     scenario("Last column on a new Game.") {
       Given("A new game")
       val game: Game = Game(cols, rows)
-      When("Evaluate the points for the first Slot(6)")
-      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(6).get).horWin.eval
-      Then("It should deliver 4 times the pointsForHorSpace")
-      assert(slotPoints === 4*pointsForHorSpace )
+      When("Evaluate the points for the first Slot(cols-1)")
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(cols-1).get).horWin.eval
+      Then("It should deliver 4 times the pointsForHorSpace and 1 border")
+      assert(slotPoints === 4*pointsForHorSpace + 1)
     }
     scenario("3. column on a new Game.") {
       Given("A new game")
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(2)")
       val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(2).get).horWin.eval
-      Then("It should deliver (2+4) times the pointsForHorSpace")
-      assert(slotPoints === (2+4)*pointsForHorSpace )
+      Then("It should deliver (2+4) times the pointsForHorSpace and 2 borders")
+      assert(slotPoints === 4*pointsForHorSpace +2 )
     }
 
     scenario("First column on a started Game with own Chip.") {
@@ -51,8 +51,8 @@ import Combinations._
       game.dropChip(3, RedChip)
       When("Evaluate the points for the first Slot(0)")
       val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horWin.eval
-      Then("It should deliver 3 times the pointsForHorSpace and 1 pointsForHorMatch")
-      assert(slotPoints === 3*pointsForHorSpace+1*pointsForHorMatch )
+      Then("It should deliver 3 times the pointsForHorSpace and 1 pointsForHorMatch and 1 border")
+      assert(slotPoints === 3*pointsForHorSpace+1*pointsForHorMatch + 1 )
     }
 
     scenario("First column on a started Game with another Chip.") {

@@ -231,6 +231,46 @@ class ConnectFourGameTest extends FeatureTester {
     }
 
   }
+  feature("Count SpaceChips in the same row before this Spot") {
+    scenario("There are some SpaceChips") {
+      Given("new Game with one Chip")
+      val game = new ConnectFourGame().game
+      game.dropChip(1, RedChip)
+      When("Count SpaceChips")
+      val spotCount = game.countSpaceBefore(game.retrieveSpot(5,0))
+      Then("Then this finds the 3 Spots")
+      assert(spotCount === 3)
+    }
+    scenario("There are no SpaceChips") {
+      Given("new Game with one Chip")
+      val game = new ConnectFourGame().game
+      game.dropChip(1, RedChip)
+      When("Count SpaceChips")
+      val spotCount = game.countSpaceBefore(game.retrieveSpot(2,0))
+      Then("Then this finds the 0 Spot")
+      assert(spotCount === 0)
+    }
+  }
+  feature("Count SpaceChips in the same row after this Spot") {
+    scenario("There are some SpaceChips") {
+      Given("new Game with one Chip")
+      val game = new ConnectFourGame().game
+      game.dropChip(cols-1, RedChip)
+      When("Count SpaceChips")
+      val spotCount = game.countSpaceAfter(game.retrieveSpot(cols-5,0))
+      Then("Then this finds the 3 Spots")
+      assert(spotCount === 3)
+    }
+    scenario("There are no SpaceChips") {
+      Given("new Game with one Chip")
+      val game = new ConnectFourGame().game
+      game.dropChip(cols-1, RedChip)
+      When("Count SpaceChips")
+      val spotCount = game.countSpaceAfter(game.retrieveSpot(cols-2,0))
+      Then("Then this finds the 0 Spot")
+      assert(spotCount === 0)
+    }
+  }
 
   feature("Drop the Chip in a Slot") {
     scenario("In a Slot with a Spot left") {
