@@ -65,13 +65,18 @@ case class Game(val slots: List[Slot]) {
 
   override def toString = (for (slot <- slots) yield (slot.toString)).mkString("\n")
 
-  def findSpot(col:Int,row:Int) = {
-    validateSpot(col, row)
-    slots(col).findSpot(row)
+  def retrieveSpot(col:Int,row:Int):Spot = {
+   findSpot(col, row) match {
+     case Some(spot) => spot
+     case None => throw new IllegalArgumentException
+   }
   }
-  def validateSpot(col:Int,row:Int): Unit =
-    if(col < 0 || col >= cols  || row < 0 || row >= rows)
-      throw new IllegalArgumentException
+  def findSpotInRowBefore(spot: Spot): Option[Spot] = {
+    findSpot(spot.col-1, spot.row)
+  }
+  def findSpot(col:Int,row:Int): Option[Spot] =
+    if(col < 0 || col >= cols  || row < 0 || row >= rows)      None
+  else Some(slots(col).findSpot(row))
 
   def findFirstEmpty(slotIndex: Int): Option[Spot] = {
     if (slotIndex < slots.length) {

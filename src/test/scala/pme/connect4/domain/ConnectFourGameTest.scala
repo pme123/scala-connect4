@@ -3,7 +3,8 @@ package pme.connect4.domain
 import pme.connect4.util.FeatureTester
 
 class ConnectFourGameTest extends FeatureTester {
-import GameConfig._
+
+  import pme.connect4.domain.GameConfig._
 
 
   feature("Create Game") {
@@ -12,7 +13,7 @@ import GameConfig._
       When("Create the new Game")
       val cols = 4
       val rows = 5
-      val game: Game = Game(cols,rows)
+      val game: Game = Game(cols, rows)
       Then("All Slots are 'Empty'")
       for {
         slot <- game.slots
@@ -35,7 +36,7 @@ import GameConfig._
     }
     scenario("half filled") {
       Given("Slot with one Yellow")
-      val spots =List( Spot(YellowChip,1,0), Spot(SpaceChip,1,1))
+      val spots = List(Spot(YellowChip, 1, 0), Spot(SpaceChip, 1, 1))
       val slot = new Slot(1, spots)
       When("Find first Empty Spot Position")
       val emptySpot = slot.findFirstEmpty
@@ -44,8 +45,8 @@ import GameConfig._
     }
     scenario("full Slot") {
       Given("Slot filled with Yellow- and RedChips")
-      val spots =List( Spot(YellowChip,1,0), Spot(RedChip,1,1))
-      val slot = Slot(2,spots)
+      val spots = List(Spot(YellowChip, 1, 0), Spot(RedChip, 1, 1))
+      val slot = Slot(2, spots)
       When("Find first Empty Spot Position")
       val emptySpot = slot.findFirstEmpty
       Then("Then this is None")
@@ -73,6 +74,45 @@ import GameConfig._
     }
 
   }
+
+  feature("Find Spot in Game") {
+    scenario("Valid Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Find first Empty Spot Position")
+      val emptySpot = game.findSpot(0, 0)
+      Then("Then this finds something")
+      assert(emptySpot.get.chip === SpaceChip)
+    }
+    scenario("Invalid Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Find first Empty Spot Position")
+      val emptySpot = game.findSpot(0, rows)
+      Then("Then this finds nothing")
+      assert(emptySpot === None)
+    }
+  }
+  feature("Retrieve Spot in Game") {
+    scenario("Valid Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Retrieve first Empty Spot Position")
+      val emptySpot = game.retrieveSpot(0, 0)
+      Then("Then this retrieves something")
+      assert(emptySpot.chip === SpaceChip)
+    }
+    scenario("Retrieve Invalid Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Retrieve first Empty Spot Position")
+      Then("Then this throws an Exception")
+      intercept[IllegalArgumentException] {
+        game.retrieveSpot(0, rows)
+      }
+    }
+  }
+
   feature("Has empty Spot in Game") {
     scenario("it has empty spot") {
       Given("Game")
@@ -86,7 +126,7 @@ import GameConfig._
     scenario("it has not an empty spot") {
       Given("Game with a filled Slot")
       val game = new ConnectFourGame()
-      for(count <- 0 to rows) game.dropChip(3,RedChip)
+      for (count <- 0 to rows) game.dropChip(3, RedChip)
       When("check to have empty spot")
       val hasEmptySpot = game.hasEmptySlot(3)
       Then("Then this is 0")
@@ -146,7 +186,7 @@ import GameConfig._
       val game = new ConnectFourGame()
       game.dropChip(3, RedChip)
       game.dropChip(3, YellowChip)
-      for(index <- 0 until 3) game.dropChip(3, RedChip)
+      for (index <- 0 until 3) game.dropChip(3, RedChip)
       When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
       Then("Then this is None")
@@ -155,7 +195,7 @@ import GameConfig._
     scenario("Has vertical Winner") {
       Given("Game with vertical Winner")
       val game = new ConnectFourGame()
-      for(index <- 0 until 4) game.dropChip(3, RedChip)
+      for (index <- 0 until 4) game.dropChip(3, RedChip)
       When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
       Then("Then this is has one Winner")
@@ -167,7 +207,7 @@ import GameConfig._
     scenario("Has horizontal Winner") {
       Given("Game with horizontal Winner")
       val game = new ConnectFourGame()
-      for(index <- 0 until 4) game.dropChip(index, RedChip)
+      for (index <- 0 until 4) game.dropChip(index, RedChip)
       When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
       Then("Then this is has one Winner")
@@ -178,22 +218,22 @@ import GameConfig._
     scenario("Has horizontal Winner with more than needed") {
       Given("Game with horizontal Winner")
       val game = new ConnectFourGame()
-      for(index <- 0 until 5) game.dropChip(index, RedChip)
+      for (index <- 0 until 5) game.dropChip(index, RedChip)
       When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
       Then("Then this is has two Winners")
       assert(positions.size === 2)
-      for(pos<-positions) yield ( assert(pos.size === winningChips) )
+      for (pos <- positions) yield (assert(pos.size === winningChips))
     }
 
 
     scenario("Has diagonal Winner") {
       Given("Game with diagonal Winner")
       val game = new ConnectFourGame()
-      for(index <- 1 until 4) game.dropChip(index, YellowChip)
-      for(index <- 2 until 4) game.dropChip(index, YellowChip)
-      for(index <- 3 until 4) game.dropChip(index, YellowChip)
-      for(index <- 0 until 4) game.dropChip(index, RedChip)
+      for (index <- 1 until 4) game.dropChip(index, YellowChip)
+      for (index <- 2 until 4) game.dropChip(index, YellowChip)
+      for (index <- 3 until 4) game.dropChip(index, YellowChip)
+      for (index <- 0 until 4) game.dropChip(index, RedChip)
       When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
       Then("Then this is has one Winner")
@@ -203,10 +243,10 @@ import GameConfig._
     scenario("Has diagonal down Winner") {
       Given("Game with diagonal down Winner")
       val game = new ConnectFourGame()
-      for(index <- 0 until 3) game.dropChip(index, YellowChip)
-      for(index <- 0 until 2) game.dropChip(index, YellowChip)
-      for(index <- 0 until 1) game.dropChip(index, YellowChip)
-      for(index <- 0 until 4) game.dropChip(index, RedChip)
+      for (index <- 0 until 3) game.dropChip(index, YellowChip)
+      for (index <- 0 until 2) game.dropChip(index, YellowChip)
+      for (index <- 0 until 1) game.dropChip(index, YellowChip)
+      for (index <- 0 until 4) game.dropChip(index, RedChip)
       When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
       Then("this has one Winner")
@@ -216,25 +256,25 @@ import GameConfig._
     scenario("Has diagonal and horizontal Winner") {
       Given("Game with diagonal and horizontal Winner")
       val game = new ConnectFourGame()
-      for(index <- 1 until 4) game.dropChip(index, RedChip)
-      for(index <- 2 until 4) game.dropChip(index, YellowChip)
-      for(index <- 3 until 4) game.dropChip(index, YellowChip)
-      for(index <- 0 until 4) game.dropChip(index, RedChip)
+      for (index <- 1 until 4) game.dropChip(index, RedChip)
+      for (index <- 2 until 4) game.dropChip(index, YellowChip)
+      for (index <- 3 until 4) game.dropChip(index, YellowChip)
+      for (index <- 0 until 4) game.dropChip(index, RedChip)
       When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
       Then("this has two Winners")
       assert(positions.size === 2)
-      for(pos<-positions) yield ( assert(pos.size === winningChips) )
+      for (pos <- positions) yield (assert(pos.size === winningChips))
     }
     scenario("Has lots of Winner") {
       Given("Game with a Cube of Red")
       val game = new ConnectFourGame()
-      for(index2 <- 0 until 4; index <- 0 until 4) game.dropChip(index, RedChip)
+      for (index2 <- 0 until 4; index <- 0 until 4) game.dropChip(index, RedChip)
       When("check has winning Spots")
       val positions = game.winningSpots(RedChip)
       Then("Then this is has 4+4+2 Winner")
-      assert(positions.size === 4+4+2)
-      for(pos<-positions) yield ( assert(pos.size === winningChips) )
+      assert(positions.size === 4 + 4 + 2)
+      for (pos <- positions) yield (assert(pos.size === winningChips))
     }
 
 
