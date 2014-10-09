@@ -1,8 +1,8 @@
 package pme.connect4.domain
 
+import pme.connect4.domain.Combinations._
 import pme.connect4.domain.Game.Winner
 import pme.connect4.domain.GameConfig._
-import Combinations._
 
 import scala.collection.immutable.::
 import scala.util.{Failure, Success, Try}
@@ -15,6 +15,7 @@ class ConnectFourGame {
   def findFirstEmptySpot(slotIndex: Int): Option[Spot] = {
     game.findFirstEmpty(slotIndex)
   }
+
   def findFirstTakenSpot(slotIndex: Int): Option[Spot] = {
     game.findFirstTaken(slotIndex)
   }
@@ -47,7 +48,7 @@ object Game {
   type Winner = List[Spot]
 
   def apply(cols: Int, rows: Int): Game =
-    Game((for (col <- 0 until cols) yield (Slot(col, rows))).toList)
+    Game((for (col <- 0 until cols) yield Slot(col, rows)).toList)
 
   sealed abstract class WinDirection
 
@@ -59,30 +60,45 @@ object Game {
 
 }
 
-case class Game(val slots: List[Slot]) {
+case class Game(slots: List[Slot]) {
 
   case class Attempt(offset: (Int, Int), spots: List[Spot])
 
-  override def toString = (for (slot <- slots) yield (slot.toString)).mkString("\n")
+  override def toString = (for (slot <- slots) yield slot.toString).mkString("\n")
 
-  def retrieveSpot(col:Int,row:Int):Spot = {
-   findSpot(col, row) match {
-     case Some(spot) => spot
-     case None => throw new IllegalArgumentException
-   }
+  def retrieveSpot(col: Int, row: Int): Spot = {
+    findSpot(col, row) match {
+      case Some(spot) => spot
+      case None => throw new IllegalArgumentException
+    }
   }
+
+  def findSpot(col: Int, row: Int): Option[Spot] =
+    if (col < 0 || col >= cols || row < 0 || row >= rows) None
+    else Some(slots(col).findSpot(row))
+
   def findSpotInRowBefore(spot: Spot): Option[Spot] = {
-    findSpot(spot.col-1, spot.row)
+    findSpot(spot.col - 1, spot.row)
   }
-  def findSpot(col:Int,row:Int): Option[Spot] =
-    if(col < 0 || col >= cols  || row < 0 || row >= rows)      None
-  else Some(slots(col).findSpot(row))
+
+  def findSpotInRowAfter(spot: Spot): Option[Spot] = {
+    findSpot(spot.col + 1, spot.row)
+  }
+
+  def findSpotInColBelow(spot: Spot): Option[Spot] = {
+    findSpot(spot.col, spot.row - 1)
+  }
+
+  def findSpotInColAbove(spot: Spot): Option[Spot] = {
+    findSpot(spot.col, spot.row + 1)
+  }
 
   def findFirstEmpty(slotIndex: Int): Option[Spot] = {
     if (slotIndex < slots.length) {
       slots(slotIndex).findFirstEmpty
     } else None
   }
+
   def findFirstTaken(slotIndex: Int): Option[Spot] = {
     if (slotIndex < slots.length) {
       slots(slotIndex).findFirstTaken
@@ -98,7 +114,7 @@ case class Game(val slots: List[Slot]) {
     val matchedSpots = (for {
       slot <- slots
       spot <- slot.spots
-    } yield (spot)).filter(spot => spot.chip == chip)
+    } yield spot).filter(spot => spot.chip == chip)
 
     def nextAttempts(spot: Spot): List[Option[Attempt]] = {
 
@@ -124,7 +140,7 @@ case class Game(val slots: List[Slot]) {
         , nextAttempt(Attempt((-1, 1), List(spot))))
     }
 
-    if (matchedSpots isEmpty) Nil
+    if (matchedSpots.isEmpty) Nil
     else {
       for {
         matchedSpot <- matchedSpots
@@ -143,24 +159,25 @@ case class Game(val slots: List[Slot]) {
 
 object Slot {
   def apply(col: Int, rows: Int): Slot = {
-    new Slot(col, (for (row <- 0 until rows) yield (new Spot(SpaceChip, col, row))).toList)
+    new Slot(col, (for (row <- 0 until rows) yield new Spot(SpaceChip, col, row)).toList)
   }
 }
 
 
-case class Slot(val col: Int, pSpots: List[Spot]) {
+case class Slot(col: Int, pSpots: List[Spot]) {
 
   var spots = pSpots
 
   override def toString = spots.mkString(",")
 
-  def findSpot(row:Int) = {
+  def findSpot(row: Int) = {
     spots(row)
   }
 
   def findFirstEmpty: Option[Spot] = {
-    spots.filter(spot => spot.chip == SpaceChip).headOption
+    spots.find(spot => spot.chip == SpaceChip)
   }
+
   def findFirstTaken: Option[Spot] = {
     spots.filter(spot => spot.chip != SpaceChip).lastOption
   }
@@ -169,7 +186,7 @@ case class Slot(val col: Int, pSpots: List[Spot]) {
     findFirstEmpty match {
       case Some(spot) =>
         val newSpot = new Spot(chip, spot.col, spot.row)
-        spots = (newSpot :: (spots.filterNot(oldSpot => spot == oldSpot)).toList).sortWith((left, right) => left.row < right.row)
+        spots = (newSpot :: spots.filterNot(oldSpot => spot == oldSpot).toList).sortWith((left, right) => left.row < right.row)
         Success(newSpot)
       case None => Failure(new IllegalArgumentException(s"No Empty Spot in the column $spots.head.col"))
     }

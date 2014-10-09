@@ -22,7 +22,6 @@ class ConnectFourGameTest extends FeatureTester {
       assert(game.slots.length === cols)
       assert(game.slots(0).spots.length === rows)
     }
-
   }
 
   feature("Find first empty Spot in Slot") {
@@ -79,7 +78,7 @@ class ConnectFourGameTest extends FeatureTester {
     scenario("Valid Spot") {
       Given("new Game")
       val game = new ConnectFourGame().game
-      When("Find first Empty Spot Position")
+      When("Find Spot")
       val emptySpot = game.findSpot(0, 0)
       Then("Then this finds something")
       assert(emptySpot.get.chip === SpaceChip)
@@ -87,8 +86,84 @@ class ConnectFourGameTest extends FeatureTester {
     scenario("Invalid Spot") {
       Given("new Game")
       val game = new ConnectFourGame().game
-      When("Find first Empty Spot Position")
+      When("Find Spot outside the game")
       val emptySpot = game.findSpot(0, rows)
+      Then("Then this finds nothing")
+      assert(emptySpot === None)
+    }
+  }
+  feature("Find Spot in the same row before this Spot") {
+    scenario("Valid Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Find Spot in the same row before this Spot.")
+      val emptySpot = game.findSpotInRowBefore(game.retrieveSpot(1,0))
+      Then("Then this finds the Spot")
+      assert(emptySpot.get.col === 0)
+      assert(emptySpot.get.row === 0)
+    }
+    scenario("Invalid Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Find Spot in the same row before this Spot.")
+      val emptySpot = game.findSpotInRowBefore(game.retrieveSpot(0, 0))
+      Then("Then this finds nothing")
+      assert(emptySpot === None)
+    }
+  }
+  feature("Find Spot in the same row after this Spot") {
+    scenario("Valid Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Find Spot in the same row after this Spot.")
+      val emptySpot = game.findSpotInRowAfter(game.retrieveSpot(1,0))
+      Then("Then this finds the Spot")
+      assert(emptySpot.get.col === 2)
+      assert(emptySpot.get.row === 0)
+    }
+    scenario("Invalid Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Find Spot in the same row after this Spot.")
+      val emptySpot = game.findSpotInRowAfter(game.retrieveSpot(cols-1, 0))
+      Then("Then this finds nothing")
+      assert(emptySpot === None)
+    }
+  }
+  feature("Find Spot in the same col below this Spot") {
+    scenario("Valid Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Find Spot in the same col below this Spot.")
+      val emptySpot = game.findSpotInColBelow(game.retrieveSpot(0,1))
+      Then("Then this finds the Spot")
+      assert(emptySpot.get.col === 0)
+      assert(emptySpot.get.row === 0)
+    }
+    scenario("Invalid Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Find Spot in the same col below this Spot.")
+      val emptySpot = game.findSpotInColBelow(game.retrieveSpot(0, 0))
+      Then("Then this finds nothing")
+      assert(emptySpot === None)
+    }
+  }
+  feature("Find Spot in the same col above this Spot") {
+    scenario("Valid Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Find Spot in the same col above this Spot.")
+      val emptySpot = game.findSpotInColAbove(game.retrieveSpot(0,1))
+      Then("Then this finds the Spot")
+      assert(emptySpot.get.col === 0)
+      assert(emptySpot.get.row === 2)
+    }
+    scenario("Invalid Spot") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Find Spot in the same col above this Spot.")
+      val emptySpot = game.findSpotInColAbove(game.retrieveSpot(0, rows-1))
       Then("Then this finds nothing")
       assert(emptySpot === None)
     }
@@ -223,7 +298,7 @@ class ConnectFourGameTest extends FeatureTester {
       val positions = game.winningSpots(RedChip)
       Then("Then this is has two Winners")
       assert(positions.size === 2)
-      for (pos <- positions) yield (assert(pos.size === winningChips))
+      for (pos <- positions) yield assert(pos.size === winningChips)
     }
 
 
@@ -264,7 +339,7 @@ class ConnectFourGameTest extends FeatureTester {
       val positions = game.winningSpots(RedChip)
       Then("this has two Winners")
       assert(positions.size === 2)
-      for (pos <- positions) yield (assert(pos.size === winningChips))
+      for (pos <- positions) yield assert(pos.size === winningChips)
     }
     scenario("Has lots of Winner") {
       Given("Game with a Cube of Red")
@@ -274,10 +349,8 @@ class ConnectFourGameTest extends FeatureTester {
       val positions = game.winningSpots(RedChip)
       Then("Then this is has 4+4+2 Winner")
       assert(positions.size === 4 + 4 + 2)
-      for (pos <- positions) yield (assert(pos.size === winningChips))
+      for (pos <- positions) yield assert(pos.size === winningChips)
     }
-
-
   }
 
 }
