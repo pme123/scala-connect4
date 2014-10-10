@@ -111,7 +111,7 @@ class GameBoard extends Pane {
 
   def switchPlayer: Unit = {
     activeChip = activeChip.other
-    for (chip <- chipsToPlay) chip.fill = colorMap(activeChip)
+    if(chipsToPlay!=null)    for (chip <- chipsToPlay) chip.fill = colorMap(activeChip)
   }
 
   def runNextTurn = {
