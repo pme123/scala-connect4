@@ -174,6 +174,16 @@ import Combinations._
       Then("It should deliver 0")
       assert(slotPoints === 0)
     }
+    scenario("Game with 2 other Chips - Space next to Space that is needed.") {
+      Given("A game with 2 other Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(0, RedChip)
+      for (i <- 3 to 4) game.dropChip(i, YellowChip)
+      When("Evaluate the points for the Slot(1)")
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(1).get).horDefence.eval
+      Then("It should deliver 0")
+      assert(slotPoints === 0)
+    }
   }
 
   feature("Evaluate the points for the Vertical defence Combinator") {
