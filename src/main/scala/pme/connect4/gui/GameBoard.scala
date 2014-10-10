@@ -12,10 +12,6 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape._
 import scalafx.util.Duration
 
-
-/**
- * Created by pascal.mengelt on 18.09.2014.
- */
 class GameBoard extends Pane {
 
   import pme.connect4.domain.GameConfig._
@@ -34,7 +30,7 @@ class GameBoard extends Pane {
   var myChip: Chip = activeChip.other
 
 
-  def startNewGame = {
+  def startNewGame() = {
     fourConnect = new ConnectFourGame
     chipsToPlay = initChipsToPlay
     gameSpots = initGameSpots
@@ -68,9 +64,9 @@ class GameBoard extends Pane {
       byY = dropHeight * fieldHeight
     }
     transition.play()
-    verifyTurn
-    switchPlayer
-     runNextTurn
+    verifyTurn()
+    switchPlayer()
+    runNextTurn()
   }
 
   def initGameSpots = {
@@ -91,7 +87,7 @@ class GameBoard extends Pane {
         radiusX = fieldWidth / 2 - 4 * slotMargin
         radiusY = fieldHeight / 2 - 4 * slotMargin
       }
-      val shape = (Shape.subtract(rect, hole)).asInstanceOf[javafx.scene.shape.Path]
+      val shape = Shape.subtract(rect, hole).asInstanceOf[javafx.scene.shape.Path]
       new SpotView(fourConnect.game.slots(col).spots(verFieldCount - 1 - row), shape)
     }
   }
@@ -109,36 +105,35 @@ class GameBoard extends Pane {
     chipView
   }
 
-  def switchPlayer: Unit = {
+  def switchPlayer(): Unit = {
     activeChip = activeChip.other
-    if(chipsToPlay!=null)    for (chip <- chipsToPlay) chip.fill = colorMap(activeChip)
+    if (chipsToPlay != null) for (chip <- chipsToPlay) chip.fill = colorMap(activeChip)
   }
 
-  def runNextTurn = {
+  def runNextTurn() = {
     if (!gameWinnerSubject.isFinish && playAloneMode) {
-      if (myChip == activeChip) calcMyTurn
+      if (myChip == activeChip) calcMyTurn()
     }
   }
 
-  def verifyTurn = {
-    if (!gameStartedSubject.gameStarted) startGame
+  def verifyTurn() = {
+    if (!gameStartedSubject.gameStarted) startGame()
     val winners = fourConnect.winningSpots(activeChip)
 
     for {
       spotView <- gameSpots
       winner <- winners
       spot <- winner
-      if (spot.col == spotView.spot.col && spot.row == spotView.spot.row)
-
+      if spot.col == spotView.spot.col && spot.row == spotView.spot.row
     } yield {
-      if (gameStartedSubject.gameStarted) finishGame
+      if (gameStartedSubject.gameStarted) finishGame()
       spotView.blink
     }
   }
 
-  def startGame = {
-    gameStartedSubject.startGame
-    gameWinnerSubject.startGame
+  def startGame() = {
+    gameStartedSubject.startGame()
+    gameWinnerSubject.startGame()
     if (playAloneMode) myChip = activeChip.other
   }
 
@@ -146,17 +141,17 @@ class GameBoard extends Pane {
     playAloneMode = playAlone
   }
 
-  def calcMyTurn = {
+  def calcMyTurn() = {
 
-    val col = Combinations.evalBestMove(fourConnect.game,myChip)
+    val col = Combinations.evalBestMove(fourConnect.game, myChip)
     fourConnect.dropChip(col, myChip)
     dropChipView(col)
     println("My turn: " + col)
   }
 
-  def finishGame = {
+  def finishGame() = {
     chipsToPlay.foreach(chipView => chipView.visible = false)
-    gameStartedSubject.finishGame
+    gameStartedSubject.finishGame()
     gameWinnerSubject.finishGame(activeChip)
   }
 
@@ -168,12 +163,12 @@ class GameBoard extends Pane {
 class GameStartedSubject extends Subject[GameStartedSubject] {
   var gameStarted = false
 
-  protected[gui] def startGame = {
+  protected[gui] def startGame() = {
     gameStarted = true
     notifyObservers()
   }
 
-  protected[gui] def finishGame = {
+  protected[gui] def finishGame() = {
     gameStarted = false
     notifyObservers()
   }
@@ -184,9 +179,11 @@ class GameWinnerSubject extends Subject[GameWinnerSubject] {
   var gameWinner: Chip = SpaceChip
 
   protected[gui] def isFinish = gameWinner != SpaceChip
-  protected[gui] def startGame = {
+
+  protected[gui] def startGame() = {
     gameWinner = SpaceChip
   }
+
   protected[gui] def finishGame(winner: Chip) = {
     gameWinner = winner
     notifyObservers()

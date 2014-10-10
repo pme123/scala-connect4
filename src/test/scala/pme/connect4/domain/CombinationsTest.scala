@@ -1,5 +1,6 @@
 package pme.connect4.domain
 
+import pme.connect4.domain.GameConfig._
 import pme.connect4.util.FeatureTester
 
 class CombinationsTest extends FeatureTester {
@@ -184,6 +185,36 @@ import Combinations._
       Then("It should deliver 0")
       assert(slotPoints === 0)
     }
+    scenario("Game with 2 other Chips - our Chip on the other side.") {
+      Given("A game with 2 other Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(2, RedChip)
+      for (i <- 3 to 4) game.dropChip(i, YellowChip)
+      When("Evaluate the points for the Slot(5)")
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(5).get).horDefence.eval
+      Then("It should deliver 0")
+      assert(slotPoints === 0)
+    }
+  }
+
+  feature("Evaluate the points for the Vertical Combinator") {
+    scenario("First row on a new Game.") {
+      Given("A new game")
+      val game: Game = Game(cols, rows)
+      When("Evaluate the points for the first Slot(0)")
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertComb.eval
+      Then("It should deliver 0")
+      assert(slotPoints === 0)
+    }
+    scenario("Third row on a new Game.") {
+      Given("A game with 3 other Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- 0 to 2) game.dropChip(0, RedChip)
+      When("Evaluate the points for the first Slot(0)")
+      val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertComb.eval
+      Then("It should deliver 3*pointsForVerMatch")
+      assert(slotPoints === 3*pointsForVerMatch)
+    }
   }
 
   feature("Evaluate the points for the Vertical defence Combinator") {
@@ -210,8 +241,8 @@ import Combinations._
       for (i <- 0 until 3) game.dropChip(0, YellowChip)
       When("Evaluate the points for the first Slot(0)")
       val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertDefence.eval
-      Then("It should deliver max. points")
-      assert(slotPoints === pointsMax)
+      Then("It should deliver (winningChips-1)* max. points")
+      assert(slotPoints === (winningChips-1)*pointsMax)
     }
   }
 }

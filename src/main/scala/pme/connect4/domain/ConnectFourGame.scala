@@ -113,6 +113,10 @@ case class Game(slots: List[Slot]) {
       case _ =>0
     }
   }
+  def countSpotsBelow(spot: Spot, chip: Chip): Int = findSpotInColBelow(spot) match {
+    case Some(sp) if sp.chip == chip => 1 + countSpotsBelow(sp, chip)
+    case _ => 0
+  }
 
   def checkSpotBelow(spot: Spot): Boolean = {
     (for {belowSpot <- findSpotInColBelow(spot)

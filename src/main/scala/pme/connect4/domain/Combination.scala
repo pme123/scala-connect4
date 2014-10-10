@@ -15,6 +15,7 @@ abstract class Combination {
 
 object Combinations {
 
+  val pointsForVerMatch = 5
   val pointsForHorMatch = 6
   val pointsForHorSpace = 2
   val pointsMax = 2000
@@ -71,7 +72,6 @@ object Combinations {
         } {
           maxCount = maxCount max (pointsForHorSpace * countSpace + pointsForHorMatch * countChips + countBeforeBorder + countAfterBorder)
         }
-
         maxCount
       }
     }
@@ -119,20 +119,6 @@ object Combinations {
       }
     }
 
-    lazy val vertDefence = new Combination {
-      def eval: Int = {
-        var count = 0
-        breakable(for {
-          row <- spot.row - 1 to 0 by -1
-          neighbor = game.slots(spot.col).spots(row)
-
-        } yield {
-          if (neighbor.chip == activeChip.other) count += 1 else break()
-        })
-        if (winningChips - count == 1) pointsMax else 0
-      }
-    }
-
     abstract class HorCombination extends Combination {
       def minSlot(spot: Spot) = Math.max(spot.col - winningChips + 1, 0)
 
@@ -149,10 +135,32 @@ object Combinations {
         .groupBy(neighbor => neighbor._1)
         .values
         .map(attempt => attempt.map(entry => entry._2))
+      .filter(_.size == winningChips)
 
     }
 
-    def asList = List(horWin, horDefence, vertDefence)
+    lazy val vertComb = new Combination {
+      def eval: Int = {
+        var count = game.countSpotsBelow(spot, activeChip)
+        count * pointsForVerMatch
+      }
+    }
+
+    lazy val vertDefence = new Combination {
+      def eval: Int = {
+        var count = 0
+        breakable(for {
+          row <- spot.row - 1 to 0 by -1
+          neighbor = game.slots(spot.col).spots(row)
+
+        } yield {
+          if (neighbor.chip == activeChip.other) count += 1 else break()
+        })
+        if (winningChips - count == 1) count * pointsMax else 0
+      }
+    }
+
+    def asList = List(horWin, horDefence, vertComb, vertDefence)
 
   }
 

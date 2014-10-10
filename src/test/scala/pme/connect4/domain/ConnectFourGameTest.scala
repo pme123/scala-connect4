@@ -301,6 +301,38 @@ class ConnectFourGameTest extends FeatureTester {
 
   }
 
+  feature("Count the Spots below a Spot that are in row with a certain Chip.") {
+    scenario("There are 3 Chips") {
+      Given("new Game with 3 Chips")
+      val game = new ConnectFourGame().game
+      for( i <- 0 to 2) game.dropChip(1, RedChip)
+      When("Count the Spots below")
+      val countSpots = game.countSpotsBelow(game.retrieveSpot(1,3), RedChip)
+      Then("Then there are 3 Spots below")
+      assert(countSpots === 3)
+    }
+
+    scenario("There is a another Chip") {
+      Given("new Game with 1 another Chip")
+      val game = new ConnectFourGame().game
+      game.dropChip(1, YellowChip)
+      When("Count the Spots below")
+      val countSpots = game.countSpotsBelow(game.retrieveSpot(1,1), RedChip)
+      Then("Then there is no Spot below")
+      assert(countSpots === 0)
+    }
+    scenario("There is nothing below") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Count the Spots below")
+      val countSpots = game.countSpotsBelow(game.retrieveSpot(1,0), RedChip)
+      Then("Then there is no Spot below")
+      assert(countSpots === 0)
+    }
+
+
+  }
+
   feature("Drop the Chip in a Slot") {
     scenario("In a Slot with a Spot left") {
       Given("new Game")
