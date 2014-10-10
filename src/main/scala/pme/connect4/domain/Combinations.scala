@@ -8,19 +8,19 @@ import scala.collection.immutable.IndexedSeq
 
 object Combinations {
 type Combination = Boolean
+
   def evalBestMove(game: Game, activeChip: Chip): Int = {
 
     def evalPointsForSlot(spot: Spot): Int = {
       allCombinations(game, activeChip, spot).takeWhile(comb => !comb).size
     }
-
-    val pointsForSlots: List[(Int, Spot)] = for {
+   val pointsForSlots: List[(Int, Spot)] = for {
       slot <- game.slots
       spot <- slot.findFirstEmpty
     } yield {
       evalPointsForSlot(spot) -> spot
     }
-    val chosenSpot = pointsForSlots.foldLeft((0, None: Option[Spot]))((a, b) => if (a._1 < b._1) (b._1, Some(b._2)) else a)
+    val chosenSpot = pointsForSlots.foldLeft((Int.MaxValue, None: Option[Spot]))((a, b) => if (a._1 > b._1) (b._1, Some(b._2)) else a)
     println(s"chosenSpot: $chosenSpot")
     chosenSpot._2 match {
       case Some(spot: Spot) => spot.col
