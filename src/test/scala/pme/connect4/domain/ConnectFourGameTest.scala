@@ -272,6 +272,35 @@ class ConnectFourGameTest extends FeatureTester {
     }
   }
 
+  feature("Check the Spot below a Spot, if there is a SpaceChip") {
+    scenario("There is a SpaceChip") {
+      Given("new Game with one Chip")
+      val game = new ConnectFourGame().game
+      game.dropChip(1, RedChip)
+      When("Check the Spot below")
+      val hasSpotBelow = game.checkSpotBelow(game.retrieveSpot(1,1))
+      Then("Then there is NO SpaceChip below")
+      assert(hasSpotBelow)
+    }
+    scenario("There is nothing below") {
+      Given("new Game")
+      val game = new ConnectFourGame().game
+      When("Check the Spot below")
+      val hasSpotBelow = game.checkSpotBelow(game.retrieveSpot(0,0))
+      Then("Then there is NO SpaceChip below")
+      assert(hasSpotBelow)
+    }
+    scenario("There is a SpaceChip below") {
+      Given("new Game ")
+      val game = new ConnectFourGame().game
+      When("Check the Spot below")
+      val hasSpotBelow = game.checkSpotBelow(game.retrieveSpot(1,1))
+      Then("Then there is A SpaceChip below")
+      assert(!hasSpotBelow)
+    }
+
+  }
+
   feature("Drop the Chip in a Slot") {
     scenario("In a Slot with a Spot left") {
       Given("new Game")

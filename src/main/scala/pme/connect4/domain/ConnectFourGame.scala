@@ -114,6 +114,11 @@ case class Game(slots: List[Slot]) {
     }
   }
 
+  def checkSpotBelow(spot: Spot): Boolean = {
+    (for {belowSpot <- findSpotInColBelow(spot)
+          if belowSpot.chip == SpaceChip} yield belowSpot).isEmpty
+  }
+
   def dropChip(slotIndex: Int, chip: Chip): Try[Spot] = {
     slots(slotIndex).dropChip(chip)
   }

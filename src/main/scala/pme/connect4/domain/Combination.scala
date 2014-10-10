@@ -69,7 +69,6 @@ case class AllCombinations(game: Game, activeChip: Chip, spot: Spot) {
           points*/
 
           var maxCount =0
-          var maxMatchCount = 0
           for {
             attempts <- neighbors.groupBy(neighbor => neighbor._1)
           .filter(neighbor => {
@@ -79,9 +78,17 @@ case class AllCombinations(game: Game, activeChip: Chip, spot: Spot) {
             if attempts._2.length == winningChips
 
               countChips = attempts._2.count(entry => entry._2.chip == activeChip)
-            countSpace = attempts._2.count(entry => entry._2.chip == SpaceChip && (for (belowSpot <- game.findSpotInColBelow(entry._2); if(belowSpot.chip == SpaceChip) )yield belowSpot).isEmpty)
-            countBeforeBorder = 1 min game.countSpaceBefore(attempts._2.head._2)
-            countAfterBorder = 1 min game.countSpaceAfter(attempts._2.last._2)
+            countSpace = attempts._2.count(entry => entry._2.chip == SpaceChip && game.checkSpotBelow(entry._2))
+
+            countBeforeBorder = (for{spotBefore <- game.findSpotInRowBefore(attempts._2.head._2)
+            if spotBefore.chip == SpaceChip
+          if  game.checkSpotBelow(spotBefore)} yield 1).getOrElse(0)
+            /* countBeforeBorder = 0 if(game.findSpotInRowBefore(attempts._2.head._2))
+             if((for {belowSpot <- game.findSpotInColBelow(attempts._2.head._2)
+                                       if belowSpot.chip == SpaceChip } yield belowSpot).isEmpty) 1 min game.countSpaceBefore(attempts._2.head._2)*/
+            countAfterBorder =(for{spotAfter <- game.findSpotInRowAfter(attempts._2.last._2)
+                                   if spotAfter.chip == SpaceChip
+                                   if  game.checkSpotBelow(spotAfter)} yield 1).getOrElse(0)
           } {
             maxCount = maxCount max( pointsForHorSpace * countSpace + pointsForHorMatch * countChips + countBeforeBorder+ countAfterBorder)
           }
@@ -159,4 +166,6 @@ case class AllCombinations(game: Game, activeChip: Chip, spot: Spot) {
       def asList =       List(horWin, horDefence, vertDefence)
 
     }
+
+
 }

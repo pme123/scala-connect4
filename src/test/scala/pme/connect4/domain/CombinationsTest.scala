@@ -14,7 +14,7 @@ import Combinations._
       When("Evaluate the best move")
       val bestSlot = evalBestMove(game, RedChip)
       Then("It should deliver the one in the middle (3)")
-      assert(bestSlot === 3)
+      assert(bestSlot === 1)
     }
 
   }
@@ -77,11 +77,11 @@ import Combinations._
     scenario("Space is not in the same row.") {
       Given("A game with some set in the first row")
       val game: Game = Game(cols, rows)
-      for (i <- 0 until 2) game.dropChip(i, YellowChip)
+      for (i <- 0 to 1) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(0)")
       val slotPoints = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horWin.eval
-      Then("It should deliver 3 for pointsForHorSpace (2 + 2*0.5)")
-      assert(slotPoints === 3*pointsForHorSpace )
+      Then("It should deliver 2 * pointsForHorSpace")
+      assert(slotPoints === 2*pointsForHorSpace )
     }
     scenario("Space is between 2 other Chips.") {
       Given("A game with 2 other Chips.")
