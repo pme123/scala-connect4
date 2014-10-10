@@ -129,6 +129,46 @@ class CombinationsTest extends FeatureTester {
       assert(success)
     }
   }
+
+  // Diagonal up (from left-down to right-up)
+  feature("Evaluate the Diagonal up Win") {
+    scenario("1. col on a row. No Win.") {
+      Given("A game without Chips")
+      val game: Game = Game(cols, rows)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagUpWin
+      Then("It should not succed.")
+      assert(!success)
+    }
+    scenario("(winningChips-1). col and row. No Win.") {
+      Given("A game (winningChips-2) Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- 1 until winningChips - 1) {
+        for (i <- 1 until winningChips - 1) game.dropChip(i, YellowChip)
+        game.dropChip(i, RedChip)
+      }
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagUpWin
+      Then("It should not succed.")
+      assert(!success)
+    }
+
+    scenario("(winningChips). col and row. Win!") {
+      Given("A game (winningChips-1) Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- 1 until winningChips) {
+        for (i <- 1 until winningChips) game.dropChip(i, YellowChip)
+        game.dropChip(i, RedChip)
+      }
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagUpWin
+      Then("It should succed.")
+      assert(success)
+    }
+  }
+
+
+  // BEST MOVE
   feature("Evaluate the best move.") {
     scenario("A vertical Win.") {
       Given("A game with own Chips")
