@@ -71,8 +71,12 @@ case class Game(slots: List[Slot]) {
   }
 
   def findSpot(col: Int, row: Int): Option[Spot] =
-    if (col < 0 || col >= cols || row < 0 || row >= rows) None
+    if (isNotInGame(col, row)) None
     else Some(slots(col).findSpot(row))
+
+  def isNotInGame(col: Int, row: Int): Boolean = {
+    col < 0 || col >= cols || row < 0 || row >= rows
+  }
 
   def findSpotInRowBefore(spot: Spot): Option[Spot] = {
     findSpot(spot.col - 1, spot.row)
