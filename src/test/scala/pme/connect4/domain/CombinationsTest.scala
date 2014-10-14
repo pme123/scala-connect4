@@ -109,19 +109,58 @@ class CombinationsTest extends FeatureTester {
     scenario("(winningChips-1). col on a row. No Lost.") {
       Given("A game (winningChips-2) Chips")
       val game: Game = Game(cols, rows)
-      for (i <- 1 until winningChips - 1) game.dropChip(i, RedChip)
+      for (i <- 1 until winningChips - 1) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLost
       Then("It should not succed.")
       assert(!success)
     }
 
-    scenario("(winningChips). col on a row. Lost!") {
-      Given("A game (winningChips-1) Chips")
+    scenario(s"$winningChips. col on a row. Lost!") {
+      Given(s"A game ${winningChips-1} Chips")
       val game: Game = Game(cols, rows)
       for (i <- 1 until winningChips) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLost
+      Then("It should succed.")
+      assert(success)
+    }
+    scenario(s"Last chip is empty. Lost!") {
+      Given(s"A game with [y][y][y][ ]")
+      val game: Game = Game(cols, rows)
+      for (i <- cols-winningChips until cols-1) game.dropChip(i, YellowChip)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(cols-1).get).horLost
+      Then("It should succed.")
+      assert(success)
+    }
+  }
+
+  feature("Evaluate the Horizontal Lost with only 2 other Chips.") {
+    scenario("No chip [?][ ][ ][ ]. No Lost.") {
+      Given("A game without Chips")
+      val game: Game = Game(cols, rows)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLostWith2
+      Then("It should not succed.")
+      assert(!success)
+    }
+    scenario("1 Chip - No Lost.") {
+      Given("A game with [?][y][ ][ ]")
+      val game: Game = Game(cols, rows)
+      game.dropChip(1, YellowChip)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLostWith2
+      Then("It should not succed.")
+      assert(!success)
+    }
+
+    scenario("2 Chips - Lost.") {
+      Given("A game with [?][y][y][ ]")
+      val game: Game = Game(cols, rows)
+      for (i <- 1 until winningChips-1) game.dropChip(i, YellowChip)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLostWith2
       Then("It should succed.")
       assert(success)
     }
@@ -167,13 +206,14 @@ class CombinationsTest extends FeatureTester {
       Given("A game (winningChips-1) Chips")
       val game: Game = Game(cols, rows)
       for (i <- 1 until winningChips) {
-        for (i <- 1 until winningChips) game.dropChip(i, YellowChip)
         game.dropChip(i, RedChip)
+        for (i <- 1 until winningChips) game.dropChip(i, YellowChip)
+        game.dropChip(winningChips, RedChip)
       }
       When("Evaluate the points for the Slot(winningChips)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(winningChips).get).diagUpWin
-      Then("It should NOT succed.")
-      assert(!success)
+      Then("It should succed.")
+      assert(success)
     }
     scenario("(winningChips). col and row. Win!") {
       Given("A game (winningChips-1) Chips")
@@ -250,6 +290,129 @@ class CombinationsTest extends FeatureTester {
     }
   }
 
+  // Diagonal down (from left-up to right-down)
+  feature("Evaluate the Diagonal down Win") {
+    scenario("1. col on a row. No Win.") {
+      Given("A game without Chips")
+      val game: Game = Game(cols, rows)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagUpWin
+      Then("It should not succed.")
+      assert(!success)
+    }
+    scenario("(winningChips-1). col and row. No Win.") {
+      Given("A game (winningChips-2) Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- winningChips - 2 to 1 by -1) {
+        for (i <- winningChips - 2 to 1 by -1) game.dropChip(i, YellowChip)
+        game.dropChip(i, RedChip)
+      }
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagDownWin
+      Then("It should not succed.")
+      assert(!success)
+    }
+
+    scenario(s"$winningChips. col and row but without a Chip below. No Win!") {
+      Given(s"A game ${winningChips-1} Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- winningChips - 1 to 1 by -1) {
+        game.dropChip(i, RedChip)
+        for (i <- winningChips - 1 to 1 by -1) game.dropChip(i, YellowChip)
+      }
+      When(s"Evaluate the points for the Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagDownWin
+      Then("It should Not succed.")
+      assert(!success)
+    }
+    scenario("(winningChips). col and row with a Chip below. Win!") {
+      Given("A game (winningChips-1) Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- winningChips - 1 to 1 by -1) {
+        game.dropChip(i, RedChip)
+        for (i <- winningChips - 1 to 1 by -1) game.dropChip(i, YellowChip)
+        game.dropChip(0, RedChip)
+      }
+      When("Evaluate the points for the Slot(winningChips)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagDownWin
+      Then("It should succed.")
+      assert(success)
+    }
+    scenario("(winningChips). col and row. Win!") {
+      Given("A game (winningChips-1) Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- winningChips - 1 to 1 by -1) {
+        for (i <- winningChips - 1 to 1 by -1) game.dropChip(i, YellowChip)
+        game.dropChip(i, RedChip)
+      }
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(winningChips).get).diagDownWin
+      Then("It should succed.")
+      assert(success)
+    }
+  }
+
+  feature("Evaluate the Diagonal down Lost") {
+    scenario("1. col on a row. No Lost.") {
+      Given("A game without Chips")
+      val game: Game = Game(cols, rows)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(0).get).diagDownLost
+      Then("It should not succed.")
+      assert(!success)
+    }
+    scenario("(winningChips-1). col and row. No Lost.") {
+      Given("A game (winningChips-2) Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- winningChips - 2 to 1 by -1) {
+        for (i <- winningChips - 2 to 1 by -1) game.dropChip(i, YellowChip)
+        game.dropChip(i, RedChip)
+      }
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(0).get).diagDownLost
+      Then("It should not succed.")
+      assert(!success)
+    }
+
+    scenario("(winningChips). col and row but without a Chip below. No Lost!") {
+      Given("A game (winningChips-1) Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- winningChips - 1 to 1 by -1) {
+        game.dropChip(i, RedChip)
+        for (i <- winningChips - 1 to 1 by -1) game.dropChip(i, YellowChip)
+      }
+      When("Evaluate the points for the Slot(winningChips)")
+      val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(winningChips-1).get).diagDownLost
+      Then("It should NOT succed.")
+      assert(!success)
+    }
+    scenario("(winningChips). col and row with a Chip below. Lost!") {
+      Given("A game (winningChips-1) Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- winningChips - 1 to 1 by -1) {
+        game.dropChip(i, RedChip)
+        for (i <- winningChips - 1 to 1 by -1) game.dropChip(i, YellowChip)
+        game.dropChip(0, RedChip)
+      }
+      When("Evaluate the points for the Slot(0)")
+      val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(0).get).diagDownLost
+      Then("It should succed.")
+      assert(success)
+    }
+    scenario(s"$winningChips. col and row. Lost!") {
+      Given("A game (winningChips-1) Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- winningChips - 1 to 1 by -1) {
+        for (i <- winningChips - 1 to 1 by -1) game.dropChip(i, YellowChip)
+        game.dropChip(i, RedChip)
+      }
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(winningChips).get).diagDownLost
+      Then("It should succed.")
+      assert(success)
+    }
+  }
+
 
   // BEST MOVE
   feature("Evaluate the best move.") {
@@ -310,6 +473,15 @@ class CombinationsTest extends FeatureTester {
       Then("It should take the horizontal Lost.")
       assert(evalCol === winningChips - 1)
     }
+    scenario("A horizontal Lost with 2 chips.") {
+      Given("A game with 2 other Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- 2  to winningChips - 1) game.dropChip(i, YellowChip)
+      When("Evaluate the best Slot.")
+      val evalCol = evalBestMove(game, RedChip)
+      Then("It should take the horizontal Lost with 2 chips.")
+      assert(evalCol === 1)
+    }
     scenario("A horizontal Win and vertical Lost.") {
       Given("A game with other Chips")
       val game: Game = Game(cols, rows)
@@ -336,5 +508,17 @@ class CombinationsTest extends FeatureTester {
       assert(evalCol === 1)
     }
 
+    scenario("A diagonal down Win.") {
+      Given("A game with other Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- winningChips - 1 to 1 by -1) {
+        for (i <- winningChips - 1 to 1 by -1) game.dropChip(i, YellowChip)
+        game.dropChip(i, RedChip)
+      }
+      When("Evaluate the best Slot.")
+      val evalCol = evalBestMove(game, RedChip)
+      Then("It should take the diagonal down Win.")
+      assert(evalCol === winningChips)
+    }
   }
 }
