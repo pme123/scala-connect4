@@ -101,7 +101,7 @@ object Combinations {
     class HorWithSpaces(nrChips: Int) extends HorCombination(nrChips) {
 
       override def findChips(chip: Chip): Boolean = {
-        neighbors.filter(spots => spots.forall(_.chip == SpaceChip))
+        neighbors.filter(spots => spots.forall(spot => spot.chip == SpaceChip && game.checkSpotBelow(spot)))
        .nonEmpty
       }
     }

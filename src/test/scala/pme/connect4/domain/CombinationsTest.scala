@@ -193,6 +193,16 @@ class CombinationsTest extends FeatureTester {
       Then("It should not succeed.")
       assert(!success)
     }
+    scenario("4 spaces [?y][ ][ ][ ][ ][y] but take the one before. No success.") {
+      Given("A game without Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(0, YellowChip)
+      game.dropChip(5, YellowChip)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horOtherSpace4
+      Then("It should not succeed.")
+      assert(!success)
+    }
     scenario("4 spaces [?][ ][ ][ ][y]. Success.") {
       Given("A game without Chips")
       val game: Game = Game(cols, rows)
@@ -581,6 +591,17 @@ class CombinationsTest extends FeatureTester {
       val evalCol = evalBestMove(game, RedChip)
       Then("It should not take the 0.")
       assert(evalCol != 0)
+    }
+
+    scenario("Takes the 4 spaces.") {
+      Given("A game without other Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(0, YellowChip)
+      game.dropChip(5, YellowChip)
+      When("Evaluate the best Slot.")
+      val evalCol = evalBestMove(game, RedChip)
+      Then("It should take the 1.")
+      assert(evalCol === 1)
     }
   }
 
