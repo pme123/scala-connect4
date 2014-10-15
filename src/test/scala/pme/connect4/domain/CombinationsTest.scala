@@ -27,6 +27,16 @@ class CombinationsTest extends FeatureTester {
       Then("It should not succeed.")
       assert(!success)
     }
+    scenario("Slot with 3 Chips and 1 another Chip. No Win.") {
+      Given("A game with Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- 1 until winningChips) game.dropChip(0, RedChip)
+      game.dropChip(0, YellowChip)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertWin
+      Then("It should not succeed.")
+      assert(!success)
+    }
     scenario("(winningChips). row in a Slot. Win!") {
       Given("A game with (winningChips-1) other Chips")
       val game: Game = Game(cols, rows)
@@ -557,6 +567,7 @@ class CombinationsTest extends FeatureTester {
 
   // BEST MOVE
   feature("Evaluate the best move.") {
+    // Vertical
     scenario("Nothing - so take whatever there is. This should not be needed when the program is finished") {
       Given("A game with own Chips")
       val game: Game = Game(cols, rows)
@@ -597,7 +608,17 @@ class CombinationsTest extends FeatureTester {
       Then("It should take the vertical Win.")
       assert(evalCol === 3)
     }
-
+    scenario("Slot with 3 Chips and 1 another Chip. No Win.") {
+      Given("A game with Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- 1 until winningChips) game.dropChip(1, RedChip)
+      game.dropChip(1, YellowChip)
+      When("Evaluate the best Slot.")
+      val evalCol = evalBestMove(game, RedChip)
+      Then("It should take the vertical Win.")
+      assert(evalCol != 1)
+    }
+    // Hor
     scenario("A horizontal Win.") {
       Given("A game with own Chips")
       val game: Game = Game(cols, rows)
@@ -666,7 +687,7 @@ class CombinationsTest extends FeatureTester {
       Then("It should take the horizontal Win.")
       assert(evalCol === winningChips - 1)
     }
-
+    // Diagonal
     scenario("A diagonal up Win.") {
       Given("A game with other Chips")
       val game: Game = Game(cols, rows)
@@ -692,7 +713,7 @@ class CombinationsTest extends FeatureTester {
       Then("It should take the diagonal down Win.")
       assert(evalCol === winningChips)
     }
-
+    // Other
     scenario("Takes default but in the row above there is a lost.") {
       Given("A game with other Chips")
       val game: Game = Game(cols, rows)
