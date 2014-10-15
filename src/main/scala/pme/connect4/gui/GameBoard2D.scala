@@ -22,7 +22,7 @@ class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
 
   def createChip(col: Int): ChipView2D = {
     val chipView: ChipView2D = createChip(col, activeChip)
-    chipView.onMouseClicked = (me: MouseEvent) => for(chipView <- handleChipSelected(col, chipView))content.add(chipView)
+    chipView.onMouseClicked = (me: MouseEvent) => handleChipSelected(col, chipView)
     chipView
   }
 
@@ -69,6 +69,7 @@ class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
 
   protected def dropHeight(dropHeight: Int): Double = dropHeight * fieldHeight
 
+  protected def addNewChipView(newChip: ChipView2D): Unit = content.add(newChip)
 }
 
 class GameStartedSubject extends Subject[GameStartedSubject] {

@@ -1,7 +1,7 @@
 package pme.connect4.gui.d3
 
 import pme.connect4.domain.GameConfig._
-import pme.connect4.gui.GameBoard
+import pme.connect4.gui.{ChipView2D, GameBoard}
 import pme.connect4.gui.d3.ChipView3D._
 import pme.connect4.gui.d3.ConnectFourConfig3D._
 
@@ -23,13 +23,13 @@ class GameBoard3D extends Group with GameBoard[ChipView3D, SpotView3D] {
       translateX = -gameWidth / 2 + col * gameWidth / cols + chipRadius
       translateY = groundSize / 4
     }
-    chipView.onMousePressed = (me: MouseEvent) => for(chipView <- handleChipSelected(col, chipView))content.add(chipView)
+    chipView.onMousePressed = (me: MouseEvent) => handleChipSelected(col, chipView)
     chipView
   }
 
   override protected def changeMaterial(chip: ChipView3D): Unit = chip.material = materialMap(activeChip)
 
-
+  protected def addNewChipView(newChip: ChipView3D): Unit = content.add(newChip)
   protected def dropHeight(dropHeight: Int): Double = -dropHeight * groundSize / 2 / (rows + 1)
 
 }

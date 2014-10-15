@@ -10,7 +10,7 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
   val gameStartedSubject = new GameStartedSubject
   val gameWinnerSubject = new GameWinnerSubject
 
-  var fourConnect = new ConnectFourGame
+  var fourConnect:ConnectFourGame = null
   var chipsToPlay: Seq[TC] = Nil
   var gameSpots: Seq[TS] = Nil
   var activeChip: Chip = RedChip
@@ -18,6 +18,7 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
   var myChip: Chip = activeChip.other
 
   def startNewGame() = {
+    fourConnect = new ConnectFourGame
     gameStartedSubject.gameStarted = false
     chipsToPlay = initChipsToPlay
     gameSpots = initGameSpots
@@ -35,21 +36,15 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
 
   protected def initGameSpots: Seq[TS]
 
-  protected def handleChipSelected(col: Int, chip: ChipView): List[TC] = {
+  protected def handleChipSelected(col: Int, chip: ChipView) = {
     fourConnect.dropChip(col, activeChip)
     if (!fourConnect.hasEmptySlot(col)) chip.setVisible(false)
-    val otherChipV: TC = dropChipView(col)
-    verifyTurn()
-    switchPlayer()
-    val myChipVOpt = runNextTurn()
-    myChipVOpt match {
-      case Some(chipView) => List(otherChipV, chipView)
-      case None => List(otherChipV)
-    }
+      dropChipView(col)
   }
 
-  def dropChipView(col: Int): TC = {
+  def dropChipView(col: Int): Unit = {
     val newChip = createChip(col)
+    addNewChipView(newChip)
     val dropChipsCount = rows - fourConnect.findFirstTakenSpot(col).get.row
     val transition = new TranslateTransition {
       duration = Duration(1000)
@@ -57,9 +52,11 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
       byY = dropHeight(dropChipsCount)
     }
     transition.play()
-    newChip
+    verifyTurn()
+    switchPlayer()
+    runNextTurn()
   }
-
+  protected def addNewChipView(newChip: TC)
 
   protected def dropHeight(dropHeight: Int): Double
 
@@ -90,19 +87,17 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
   }
 
 
-  protected def calcMyTurn(): TC = {
+  protected def calcMyTurn() = {
     val col = Combinations.evalBestMove(fourConnect.game, myChip)
     fourConnect.dropChip(col, myChip)
-    println("My turn: " + col)
     dropChipView(col)
+    println("My turn: " + col)
   }
-
-  def runNextTurn(): Option[TC] = {
+  def runNextTurn() = {
     if (!gameWinnerSubject.isFinish && playAloneMode
-      && (myChip == activeChip)) Some(calcMyTurn())
-    else None
-  }
+      && (myChip == activeChip)) calcMyTurn()
 
+  }
   protected def changeMaterial(chip: TC)
 
   def finishGame() = {
