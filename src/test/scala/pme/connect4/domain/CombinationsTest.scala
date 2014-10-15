@@ -67,6 +67,7 @@ class CombinationsTest extends FeatureTester {
     }
   }
   // HORIZONTAL
+  // Win
   feature("Evaluate the Horizontal Win") {
     scenario("1. col on a row. No Win.") {
       Given("A game without Chips")
@@ -97,6 +98,50 @@ class CombinationsTest extends FeatureTester {
     }
   }
 
+  feature("Evaluate the Horizontal Win in two steps") {
+    scenario("There is only one Chip [ ][r][ ][ ]. No Win.") {
+      Given("A game without Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(1, RedChip)
+      When("Evaluate the points for the first Slot(2)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(2).get).horWinWith2
+      Then("It should not succeed.")
+      assert(!success)
+    }
+
+    scenario("There are 2 Chips [ ][r][r][ ]. Win!") {
+      Given("A game (winningChips-1) Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- 2 until winningChips) game.dropChip(i, RedChip)
+      When("Evaluate the points for the first Slot(winningChips)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(winningChips).get).horWinWith2
+      Then("It should succeed.")
+      assert(success)
+    }
+  }
+  feature("Evaluate the Horizontal Win in two steps with space") {
+    scenario("There is only one Chip [ ][r][ ][ ][ ]. No Win.") {
+      Given("A game without Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(1, RedChip)
+      When("Evaluate the points for the first Slot(2)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(2).get).horWinWith2AndSpace
+      Then("It should not succeed.")
+      assert(!success)
+    }
+
+    scenario("There are 2 Chips [ ][r][ ][r][ ]. Win!") {
+      Given("A game (winningChips-1) Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(1, RedChip)
+      game.dropChip(3, RedChip)
+      When("Evaluate the points for the first Slot(winningChips)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(2).get).horWinWith2AndSpace
+      Then("It should succeed.")
+      assert(success)
+    }
+  }
+  // Lost
   feature("Evaluate the Horizontal Lost") {
     scenario("1. col on a row. No Lost.") {
       Given("A game without Chips")
@@ -117,7 +162,7 @@ class CombinationsTest extends FeatureTester {
     }
 
     scenario(s"$winningChips. col on a row. Lost!") {
-      Given(s"A game ${winningChips-1} Chips")
+      Given(s"A game ${winningChips - 1} Chips")
       val game: Game = Game(cols, rows)
       for (i <- 1 until winningChips) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(0)")
@@ -128,9 +173,9 @@ class CombinationsTest extends FeatureTester {
     scenario(s"Last chip is empty. Lost!") {
       Given(s"A game with [y][y][y][ ]")
       val game: Game = Game(cols, rows)
-      for (i <- cols-winningChips until cols-1) game.dropChip(i, YellowChip)
+      for (i <- cols - winningChips until cols - 1) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(0)")
-      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(cols-1).get).horLost
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(cols - 1).get).horLost
       Then("It should succeed.")
       assert(success)
     }
@@ -157,8 +202,8 @@ class CombinationsTest extends FeatureTester {
     scenario("2 Chips - No Lost.") {
       Given("A game with [?][y][y][r]")
       val game: Game = Game(cols, rows)
-      for (i <- 1 until winningChips-1) game.dropChip(i, YellowChip)
-      game.dropChip(winningChips-1, RedChip)
+      for (i <- 1 until winningChips - 1) game.dropChip(i, YellowChip)
+      game.dropChip(winningChips - 1, RedChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLostWith2
       Then("It should Not succeed.")
@@ -167,22 +212,41 @@ class CombinationsTest extends FeatureTester {
     scenario("2 Chips - Lost.") {
       Given("A game with [?][y][y][ ]")
       val game: Game = Game(cols, rows)
-      for (i <- 1 until winningChips-1) game.dropChip(i, YellowChip)
+      for (i <- 1 until winningChips - 1) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLostWith2
       Then("It should succeed.")
       assert(success)
+    }
+    scenario("2 Chips with spaces but the first space is not the one- No Lost.") {
+      Given("A game with [?][y][ ][y][ ]")
+      val game: Game = Game(cols, rows)
+      game.dropChip(2, YellowChip)
+      game.dropChip(4, YellowChip)
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(1).get).horLostWith2AndSpace
+      Then("It should succeed.")
+      assert(!success)
+    }
+    scenario("2 Chips with spaces but the last space is not the one- No Lost.") {
+      Given("A game with [ ][y][ ][y][?]")
+      val game: Game = Game(cols, rows)
+      game.dropChip(2, YellowChip)
+      game.dropChip(4, YellowChip)
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(5).get).horLostWith2AndSpace
+      Then("It should succeed.")
+      assert(!success)
     }
     scenario("2 Chips with spaces - Lost.") {
       Given("A game with [ ][y][?][y][ ]")
       val game: Game = Game(cols, rows)
       game.dropChip(2, YellowChip)
       game.dropChip(4, YellowChip)
-      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(1).get).horLostWith2AndSpace
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(3).get).horLostWith2AndSpace
       Then("It should succeed.")
       assert(success)
     }
   }
+  // Other
   feature("Evaluate the Horizontal Other with 4 spaces.") {
     scenario("Only 3 spaces [?][ ][ ][y]. No success.") {
       Given("A game without Chips")
@@ -203,12 +267,42 @@ class CombinationsTest extends FeatureTester {
       Then("It should not succeed.")
       assert(!success)
     }
-    scenario("4 spaces [?][ ][ ][ ][y]. Success.") {
+    scenario("4 spaces [ ][?][ ][ ][y]. Success.") {
       Given("A game without Chips")
       val game: Game = Game(cols, rows)
       game.dropChip(4, YellowChip)
+      When("Evaluate the points for the first Slot(1)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(1).get).horOtherSpace4
+      Then("It should succeed.")
+      assert(success)
+    }
+  }
+
+  feature("Evaluate the Horizontal Other with 5 spaces.") {
+    scenario("Only 4 spaces [ ][?][ ][ ][y]. No success.") {
+      Given("A game with another Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(4, YellowChip)
       When("Evaluate the points for the first Slot(0)")
-      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horOtherSpace4
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(1).get).horOtherSpace5
+      Then("It should not succeed.")
+      assert(!success)
+    }
+    scenario("5 spaces [?][ ][ ][ ][ ][y] but at the edge. No success.") {
+      Given("A game with another Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(5, YellowChip)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horOtherSpace5
+      Then("It should not succeed.")
+      assert(!success)
+    }
+    scenario("5 spaces [ ][?][ ][ ][ ][y]. Success.") {
+      Given("A game with another Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(5, YellowChip)
+      When("Evaluate the points for the first Slot(1)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(1).get).horOtherSpace5
       Then("It should succeed.")
       assert(success)
     }
@@ -240,12 +334,12 @@ class CombinationsTest extends FeatureTester {
       Given("A game (winningChips-1) Chips")
       val game: Game = Game(cols, rows)
       for (i <- 1 until winningChips) {
-        game.dropChip(i-1, RedChip)
-        for (i <- 1 until winningChips-1) game.dropChip(i, YellowChip)
+        game.dropChip(i - 1, RedChip)
+        for (i <- 1 until winningChips - 1) game.dropChip(i, YellowChip)
 
       }
       When("Evaluate the points for the Slot(winningChips)")
-      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(winningChips-1).get).diagUpWin
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(winningChips - 1).get).diagUpWin
       Then("It should Not succeed.")
       assert(!success)
     }
@@ -302,12 +396,12 @@ class CombinationsTest extends FeatureTester {
       Given("A game (winningChips-1) Chips")
       val game: Game = Game(cols, rows)
       for (i <- 1 until winningChips) {
-        game.dropChip(i-1, RedChip)
-        for (i <- 1 until winningChips-1) game.dropChip(i, YellowChip)
+        game.dropChip(i - 1, RedChip)
+        for (i <- 1 until winningChips - 1) game.dropChip(i, YellowChip)
 
       }
       When("Evaluate the points for the Slot(winningChips)")
-      val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(winningChips-1).get).diagUpLost
+      val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(winningChips - 1).get).diagUpLost
       Then("It should NOT succeed.")
       assert(!success)
     }
@@ -361,7 +455,7 @@ class CombinationsTest extends FeatureTester {
     }
 
     scenario(s"$winningChips. col and row but without a Chip below. No Win!") {
-      Given(s"A game ${winningChips-1} Chips")
+      Given(s"A game ${winningChips - 1} Chips")
       val game: Game = Game(cols, rows)
       for (i <- winningChips - 1 to 1 by -1) {
         game.dropChip(i, RedChip)
@@ -429,7 +523,7 @@ class CombinationsTest extends FeatureTester {
         for (i <- winningChips - 1 to 1 by -1) game.dropChip(i, YellowChip)
       }
       When("Evaluate the points for the Slot(winningChips)")
-      val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(winningChips-1).get).diagDownLost
+      val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(winningChips - 1).get).diagDownLost
       Then("It should NOT succeed.")
       assert(!success)
     }
@@ -466,6 +560,8 @@ class CombinationsTest extends FeatureTester {
     scenario("Nothing - so take whatever there is. This should not be needed when the program is finished") {
       Given("A game with own Chips")
       val game: Game = Game(cols, rows)
+      game.dropChip(0, YellowChip)
+      game.dropChip(4, YellowChip)
       When("Evaluate the best Slot.")
       val evalCol = evalBestMove(game, RedChip)
       Then("It should take the first row.")
@@ -511,6 +607,25 @@ class CombinationsTest extends FeatureTester {
       Then("It should take the horizontal Win.")
       assert(evalCol === winningChips - 1)
     }
+    scenario("A horizontal Win in 2 steps") {
+      Given("A game with own Chips")
+      val game: Game = Game(cols, rows)
+      for (i <- 2 to 3) game.dropChip(i, RedChip)
+      When("Evaluate the best Slot.")
+      val evalCol = evalBestMove(game, RedChip)
+      Then("It should take the horizontal Win in 2 steps.")
+      assert(evalCol === 1)
+    }
+    scenario("A horizontal Win in 2 steps with space") {
+      Given("A game with own Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(2, RedChip)
+      game.dropChip(4, RedChip)
+      When("Evaluate the best Slot.")
+      val evalCol = evalBestMove(game, RedChip)
+      Then("It should take the horizontal Win in 2 steps.")
+      assert(evalCol === 3)
+    }
     scenario("A horizontal Lost.") {
       Given("A game with other Chips")
       val game: Game = Game(cols, rows)
@@ -523,7 +638,7 @@ class CombinationsTest extends FeatureTester {
     scenario("A horizontal Lost with 2 chips.") {
       Given("A game with 2 other Chips")
       val game: Game = Game(cols, rows)
-      for (i <- 2  to winningChips - 1) game.dropChip(i, YellowChip)
+      for (i <- 2 to winningChips - 1) game.dropChip(i, YellowChip)
       When("Evaluate the best Slot.")
       val evalCol = evalBestMove(game, RedChip)
       Then("It should take the horizontal Lost with 2 chips.")
@@ -537,7 +652,7 @@ class CombinationsTest extends FeatureTester {
       When("Evaluate the best Slot.")
       val evalCol = evalBestMove(game, RedChip)
       Then("It should take the horizontal Lost with 2 chips.")
-      assert(evalCol === 1)
+      assert(evalCol === 3)
     }
     scenario("A horizontal Win and vertical Lost.") {
       Given("A game with other Chips")
@@ -600,8 +715,18 @@ class CombinationsTest extends FeatureTester {
       game.dropChip(5, YellowChip)
       When("Evaluate the best Slot.")
       val evalCol = evalBestMove(game, RedChip)
-      Then("It should take the 1.")
-      assert(evalCol === 1)
+      Then("It should take the 2.")
+      assert(evalCol === 2)
+    }
+    scenario("Takes the 5 spaces.") {
+      Given("A game without other Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(0, YellowChip)
+      game.dropChip(5, YellowChip)
+      When("Evaluate the best Slot.")
+      val evalCol = evalBestMove(game, RedChip)
+      Then("It should take the 2.")
+      assert(evalCol === 2)
     }
   }
 

@@ -43,7 +43,6 @@ object Combinations {
     }
 
 
-
   }
 
   case class AllCombinations(game: Game, activeChip: Chip, spot: Spot) {
@@ -59,10 +58,12 @@ object Combinations {
 
     // HORIZONTAL
     lazy val horWin = new HorCombination(winningChips).findChips(activeChip)
+    lazy val horWinWith2 = new HorWith2Steps(winningChips).findChips(activeChip)
+    lazy val horWinWith2AndSpace = new HorWith2StepsAndSpace(winningChips+1).findChips(activeChip)
     lazy val horLost = new HorCombination(winningChips).findChips(activeChip.other)
-    lazy val horLostWith2 = new HorWith2Combination(winningChips).findChips(activeChip.other)
-    lazy val horLostWith2AndSpace = new HorWith2Combination(winningChips + 1).findChips(activeChip.other)
-    lazy val horOtherSpace5 = new HorWithSpaces(winningChips+1).findChips(activeChip)
+    lazy val horLostWith2 = new HorWith2Steps(winningChips).findChips(activeChip.other)
+    lazy val horLostWith2AndSpace = new HorWith2StepsAndSpace(winningChips + 1).findChips(activeChip.other)
+    lazy val horOtherSpace5 = new HorWithSpaces(winningChips + 1).findChips(activeChip)
     lazy val horOtherSpace4 = new HorWithSpaces(winningChips).findChips(activeChip)
 
     class HorCombination(nrChips: Int) {
@@ -70,7 +71,7 @@ object Combinations {
 
       private def maxSpot(spot: Spot) = spot.col + nrChips - 1 min cols - 1
 
-      protected def neighbors: Iterable[IndexedSeq[Spot]] = {
+      protected lazy val neighbors: Iterable[IndexedSeq[Spot]] = {
         (for {
           attempt <- minSpot(spot) to maxSpot(spot) - (nrChips - 1)
           col <- attempt until attempt + nrChips
@@ -89,11 +90,20 @@ object Combinations {
       }
     }
 
-    class HorWith2Combination(nrChips: Int) extends HorCombination(nrChips) {
+    class HorWith2Steps(nrChips: Int) extends HorCombination(nrChips) {
 
       override def findChips(chip: Chip): Boolean = {
         neighbors.filter(spots => spots.count(_.chip == chip) == 2)
-        .filter(spots => List(spots.head.chip, spots.last.chip).forall(_ == SpaceChip))
+          .filter(spots => List(spots.head.chip, spots.last.chip).forall(_ == SpaceChip))
+          .nonEmpty
+      }
+    }
+    class HorWith2StepsAndSpace(nrChips: Int) extends HorCombination(nrChips) {
+
+      override def findChips(chip: Chip): Boolean = {
+        neighbors.filter(spots => spots.count(_.chip == chip) == 2)
+          .filter(spots => spots(spots.length/2.toInt)==spot)
+          .filter(spots => List(spots.head.chip, spots.last.chip).forall(_ == SpaceChip))
           .nonEmpty
       }
     }
@@ -101,8 +111,13 @@ object Combinations {
     class HorWithSpaces(nrChips: Int) extends HorCombination(nrChips) {
 
       override def findChips(chip: Chip): Boolean = {
-        neighbors.filter(spots => spots.forall(spot => spot.chip == SpaceChip && game.checkSpotBelow(spot)))
-       .nonEmpty
+          neighbors.filter(spots =>
+            ((spot != spots.head)
+            &&(spot != spots.last)
+            && spots.forall(spot =>
+              spot.chip == SpaceChip
+                && game.checkSpotBelow(spot)))
+          ).nonEmpty
       }
     }
 
@@ -178,13 +193,16 @@ object Combinations {
 
     def asStream: Stream[Combination] = (
       horWin #:: vertWin #:: diagUpWin #:: diagDownWin // wins
-        #:: horLost #:: vertLost #:: diagUpLost #:: diagDownLost #:: horLostWith2 #:: horLostWith2AndSpace // losts
+        #:: horWinWith2 #:: horWinWith2AndSpace // wins in 2 steps
+        #:: horLost #:: vertLost #:: diagUpLost #:: diagDownLost // losts
+        #:: horLostWith2 #:: horLostWith2AndSpace // losts in 2 steps
         #:: horOtherSpace5 #:: horOtherSpace4 #:: takeWhatever #:: empty // other
       )
 
     def isALost = {
       horLost || vertLost || diagUpLost || diagDownLost || horLostWith2 || horLostWith2AndSpace
     }
+
     def isAWin = {
       horWin || vertWin || diagUpWin || diagDownWin
     }
