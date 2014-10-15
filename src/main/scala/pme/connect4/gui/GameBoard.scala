@@ -1,40 +1,27 @@
 package pme.connect4.gui
 
-import javafx.event.EventHandler
-import javafx.scene.input.MouseEvent
 
+import pme.connect4.domain.GameConfig._
 import pme.connect4.domain._
+import pme.connect4.gui.ChipView._
+import pme.connect4.gui.GuiGameConfig._
 import pme.connect4.util.{Observer, Subject}
 
+import scalafx.Includes._
 import scalafx.animation.TranslateTransition
+import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.Pane
 import scalafx.scene.paint.Color
 import scalafx.scene.shape._
 import scalafx.util.Duration
 
-class GameBoard extends Pane {
-
-  import pme.connect4.domain.GameConfig._
-  import pme.connect4.gui.ChipView._
-  import pme.connect4.gui.GuiGameConfig._
+class GameBoard extends Pane with GeneralGameBoard {
 
 
-  val gameStartedSubject = new GameStartedSubject
-  val gameWinnerSubject = new GameWinnerSubject
-
-  var fourConnect = new ConnectFourGame
-  var chipsToPlay: Seq[ChipView] = null
-  var gameSpots: Seq[SpotView] = null
-  var activeChip: Chip = RedChip
-  var playAloneMode: Boolean = false
-  var myChip: Chip = activeChip.other
-
-
-  def startNewGame() = {
-    fourConnect = new ConnectFourGame
+  override def startNewGame() = {
+    super.startNewGame()
     chipsToPlay = initChipsToPlay
     gameSpots = initGameSpots
-    gameStartedSubject.gameStarted = false
     content = chipsToPlay ++ gameSpots
   }
 
@@ -42,20 +29,18 @@ class GameBoard extends Pane {
     for {
       col <- 0 until horFieldCount
     } yield {
-      val chip: ChipView = createChip(col, fieldWidth, fieldHeight, activeChip)
-      chip.setOnMouseClicked(new EventHandler[MouseEvent] {
-        override def handle(event: MouseEvent) {
-          fourConnect.dropChip(col, activeChip)
-          dropChipView(col)
-          if (!fourConnect.hasEmptySlot(col)) chip.setVisible(false)
-        }
-      })
+      val chip: ChipView = createChip(col, activeChip)
+      chip.onMouseClicked = (me: MouseEvent) => {
+        fourConnect.dropChip(col, activeChip)
+        dropChipView(col)
+        if (!fourConnect.hasEmptySlot(col)) chip.setVisible(false)
+      }
       chip
     }
   }
 
   def dropChipView(col: Int): Unit = {
-    val newChip = createChip(col, fieldWidth, fieldHeight, activeChip)
+    val newChip = createChip(col, activeChip)
     content.add(0, newChip)
     val dropHeight = rows - fourConnect.findFirstTakenSpot(col).get.row
     val transition = new TranslateTransition {
@@ -93,7 +78,7 @@ class GameBoard extends Pane {
   }
 
 
-  def createChip(col: Int, fieldWidth: Double, fieldHeight: Double, chip: Chip): ChipView = {
+  def createChip(col: Int, chip: Chip): ChipView = {
     val chipView: ChipView = new ChipView(chip) {
       centerX = paneOffsetX + col * fieldWidth + fieldWidth / 2
       centerY = paneOffsetY - fieldHeight / 2
