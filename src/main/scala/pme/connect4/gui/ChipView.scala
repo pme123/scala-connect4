@@ -16,7 +16,7 @@ object ChipView {
   val colorMap: Map[Chip, Color] = Map(RedChip -> Color.Red, YellowChip -> Color.Yellow)
 
 }
-class ChipView(chip: Chip) extends Ellipse{
+class ChipView(chip: Chip) extends Ellipse with GeneralChipView {
   visible = true
   effect = new InnerShadow {
     offsetX = -3

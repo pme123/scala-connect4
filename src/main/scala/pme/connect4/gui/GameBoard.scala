@@ -15,27 +15,25 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape._
 import scalafx.util.Duration
 
-class GameBoard extends Pane with GeneralGameBoard {
+class GameBoard extends Pane with GeneralGameBoard[ChipView, SpotView] {
 
 
   override def startNewGame() = {
     super.startNewGame()
-    chipsToPlay = initChipsToPlay
-    gameSpots = initGameSpots
     content = chipsToPlay ++ gameSpots
   }
 
-  def initChipsToPlay: Seq[ChipView] = {
-    for {
-      col <- 0 until horFieldCount
-    } yield {
-      val chip: ChipView = createChip(col, activeChip)
-      chip.onMouseClicked = (me: MouseEvent) => {
-        fourConnect.dropChip(col, activeChip)
-        dropChipView(col)
-        if (!fourConnect.hasEmptySlot(col)) chip.setVisible(false)
-      }
-      chip
+  def createChip(col: Int): ChipView = {
+    val chip: ChipView = createChip(col, activeChip)
+    chip.onMouseClicked = (me: MouseEvent) => handleChipSelected(col, chip)
+    chip
+  }
+
+  def handleChipSelected(col: Int, chip: GeneralChipView) = {
+     {
+      fourConnect.dropChip(col, activeChip)
+      dropChipView(col)
+      if (!fourConnect.hasEmptySlot(col)) chip.setVisible(false)
     }
   }
 

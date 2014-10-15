@@ -35,9 +35,7 @@ object ConnectFour3D extends JFXApp {
   private final val cameraXform3 = new Xform()
   private final val cameraDistance: Double = 450
 
-
-  private var activeChip: Chip = RedChip
-  private var timelinePlaying = false
+  private var gameBoard: GameBoard3D = new GameBoard3D
   private var ONE_FRAME: Double = 1.0 / 24.0
   private var DELTA_MULTIPLIER: Double = 200.0
   private val CONTROL_MULTIPLIER: Double = 0.1
@@ -50,13 +48,12 @@ object ConnectFour3D extends JFXApp {
   private var mouseDeltaX: Double = .0
   private var mouseDeltaY: Double = .0
 
-  var fourConnect = new ConnectFourGame
+
 
   buildScene()
   buildCamera()
   buildGround()
-  buildChipsToPlay()
-  fourConnect = new ConnectFourGame
+  buildGameBoard()
 
   stage = new JFXApp.PrimaryStage {
     scene = new Scene(root, 1024, 768, depthBuffer = true, antiAliasing = SceneAntialiasing.Balanced) {
@@ -69,10 +66,10 @@ object ConnectFour3D extends JFXApp {
 
   }
 
-
   private def buildScene() {
     root.children += world
   }
+
 
   private def buildCamera() {
     root.children += cameraXform
@@ -97,45 +94,10 @@ object ConnectFour3D extends JFXApp {
 
     world.children += ground
   }
-
-  private def buildChipsToPlay() = {
-    for {
-      col <- 0 until cols
-    }  {
-      val chip: ChipView3D = createChip(col,  activeChip)
-      chipsToPlay.children += chip
-    }
-    world.children += chipsToPlay
+  private def buildGameBoard() {
+    gameBoard.startNewGame()
+    root.children += gameBoard
   }
-
-  def createChip(col: Int, chip: Chip): ChipView3D = {
-    val chipView: ChipView3D = new ChipView3D(chip) {
-      translateX = -gameWidth/2 + col * gameWidth / cols + chipRadius
-      translateY = groundSize/4
-    }
-    chipView.onMousePressed = (me: MouseEvent) => {
-      fourConnect.dropChip(col, activeChip)
-      dropChipView(col)
-      if (!fourConnect.hasEmptySlot(col)) chipView.setVisible(false)
-    }
-    chipView
-  }
-  def dropChipView(col: Int): Unit = {
-    val newChip = createChip(col, activeChip)
-    world.children += newChip
-    val dropHeight = rows - fourConnect.findFirstTakenSpot(col).get.row
-    val transition = new TranslateTransition {
-      duration = Duration(1000)
-      node = newChip
-      byY = -dropHeight * groundSize/2/(rows+1)
-    }
-    transition.play()
-//    verifyTurn()
- //   switchPlayer()
-//    runNextTurn()
-  }
-
-
 
    private def handleMouse(scene: Scene, root: Node) {
     scene.onMousePressed = (me: MouseEvent) => {

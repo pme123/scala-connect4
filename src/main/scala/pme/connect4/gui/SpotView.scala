@@ -9,7 +9,7 @@ import scalafx.util.Duration
 /**
  * Created by pascal.mengelt on 23.09.2014.
  */
-class SpotView(val spot: Spot, path: javafx.scene.shape.Path) extends Path(path) {
+class SpotView(val spot: Spot, path: javafx.scene.shape.Path) extends Path(path) with GeneralSpotView {
   self =>
 
   def blink {
