@@ -4,7 +4,7 @@ package pme.connect4.gui
 import pme.connect4.domain.GameConfig._
 import pme.connect4.domain._
 import pme.connect4.gui.ChipView._
-import pme.connect4.gui.GuiGameConfig._
+import pme.connect4.gui.GuiGameConfig2D._
 import pme.connect4.util.{Observer, Subject}
 
 import scalafx.Includes._
@@ -24,32 +24,9 @@ class GameBoard extends Pane with GeneralGameBoard[ChipView, SpotView] {
   }
 
   def createChip(col: Int): ChipView = {
-    val chip: ChipView = createChip(col, activeChip)
-    chip.onMouseClicked = (me: MouseEvent) => handleChipSelected(col, chip)
-    chip
-  }
-
-  def handleChipSelected(col: Int, chip: GeneralChipView) = {
-     {
-      fourConnect.dropChip(col, activeChip)
-      dropChipView(col)
-      if (!fourConnect.hasEmptySlot(col)) chip.setVisible(false)
-    }
-  }
-
-  def dropChipView(col: Int): Unit = {
-    val newChip = createChip(col, activeChip)
-    content.add(0, newChip)
-    val dropHeight = rows - fourConnect.findFirstTakenSpot(col).get.row
-    val transition = new TranslateTransition {
-      duration = Duration(1000)
-      node = newChip
-      byY = dropHeight * fieldHeight
-    }
-    transition.play()
-    verifyTurn()
-    switchPlayer()
-    runNextTurn()
+    val chipView: ChipView = createChip(col, activeChip)
+    chipView.onMouseClicked = (me: MouseEvent) => content.add(handleChipSelected(col, chipView))
+    chipView
   }
 
   def initGameSpots = {
@@ -88,10 +65,7 @@ class GameBoard extends Pane with GeneralGameBoard[ChipView, SpotView] {
     chipView
   }
 
-  def switchPlayer(): Unit = {
-    activeChip = activeChip.other
-    if (chipsToPlay != null) for (chip <- chipsToPlay) chip.fill = colorMap(activeChip)
-  }
+
 
   def runNextTurn() = {
     if (!gameWinnerSubject.isFinish && playAloneMode) {
@@ -141,6 +115,8 @@ class GameBoard extends Pane with GeneralGameBoard[ChipView, SpotView] {
   def addGameStartedObserver(observer: Observer[GameStartedSubject]) = gameStartedSubject.addObserver(observer)
 
   def addGameWinnerObserver(observer: Observer[GameWinnerSubject]) = gameWinnerSubject.addObserver(observer)
+
+  override protected def changeMaterial(chip: ChipView): Unit = chip.fill = colorMap(activeChip)
 }
 
 class GameStartedSubject extends Subject[GameStartedSubject] {

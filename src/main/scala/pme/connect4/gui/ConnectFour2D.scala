@@ -8,9 +8,9 @@ import scalafx.scene.layout.{VBox, BorderPane, Pane}
 import scalafx.scene.paint.Color
 import scalafx.stage.PopupWindow
 
-object AkkaConnectFour extends JFXApp {
+object ConnectFour2D extends JFXApp {
 
-  import pme.connect4.gui.GuiGameConfig._
+  import pme.connect4.gui.GuiGameConfig2D._
 
 
 
@@ -31,9 +31,9 @@ object AkkaConnectFour extends JFXApp {
   lazy val gameBoard = new GameBoard
 
 
-  lazy val controlPane = new ControlPane(gameBoard)
+  lazy val controlPane = new ControlPane2D(gameBoard)
 
-  lazy val infoPanel = new InfoPane(gameBoard)
+  lazy val infoPanel = new InfoPane2D(gameBoard)
 
 
 }

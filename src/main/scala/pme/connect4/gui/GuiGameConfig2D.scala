@@ -1,6 +1,6 @@
 package pme.connect4.gui
 
-object GuiGameConfig {
+object GuiGameConfig2D {
   val paneSize = (800, 880)
   val gameSize= (784.0, 842.0)
 
