@@ -1,19 +1,16 @@
 package pme.connect4.gui
 
 
-import pme.connect4.domain.GameConfig._
 import pme.connect4.domain._
 import pme.connect4.gui.ChipView2D._
 import pme.connect4.gui.GuiGameConfig2D._
 import pme.connect4.util.{Observer, Subject}
 
 import scalafx.Includes._
-import scalafx.animation.TranslateTransition
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.Pane
 import scalafx.scene.paint.Color
 import scalafx.scene.shape._
-import scalafx.util.Duration
 
 class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
 
@@ -25,7 +22,7 @@ class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
 
   def createChip(col: Int): ChipView2D = {
     val chipView: ChipView2D = createChip(col, activeChip)
-    chipView.onMouseClicked = (me: MouseEvent) => content.add(handleChipSelected(col, chipView))
+    chipView.onMouseClicked = (me: MouseEvent) => for(chipView <- handleChipSelected(col, chipView))content.add(chipView)
     chipView
   }
 
@@ -52,7 +49,6 @@ class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
     }
   }
 
-
   def createChip(col: Int, chip: Chip): ChipView2D = {
     val chipView: ChipView2D = new ChipView2D(chip) {
       centerX = paneOffsetX + col * fieldWidth + fieldWidth / 2
@@ -65,59 +61,13 @@ class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
     chipView
   }
 
-
-
-  def runNextTurn() = {
-    if (!gameWinnerSubject.isFinish && playAloneMode) {
-      if (myChip == activeChip) calcMyTurn()
-    }
-  }
-
-  def verifyTurn() = {
-    if (!gameStartedSubject.gameStarted) startGame()
-    val winners = fourConnect.winningSpots(activeChip)
-
-    for {
-      spotView <- gameSpots
-      winner <- winners
-      spot <- winner
-      if spot.col == spotView.spot.col && spot.row == spotView.spot.row
-    } yield {
-      if (gameStartedSubject.gameStarted) finishGame()
-      spotView.blink
-    }
-  }
-
-  def startGame() = {
-    gameStartedSubject.startGame()
-    gameWinnerSubject.startGame()
-    if (playAloneMode) myChip = activeChip.other
-  }
-
-  def playAlone(playAlone: Boolean) = {
-    playAloneMode = playAlone
-  }
-
-  def calcMyTurn() = {
-
-    val col = Combinations.evalBestMove(fourConnect.game, myChip)
-    fourConnect.dropChip(col, myChip)
-    dropChipView(col)
-    println("My turn: " + col)
-  }
-
-  def finishGame() = {
-    chipsToPlay.foreach(chipView => chipView.visible = false)
-    gameStartedSubject.finishGame()
-    gameWinnerSubject.finishGame(activeChip)
-  }
-
   def addGameStartedObserver(observer: Observer[GameStartedSubject]) = gameStartedSubject.addObserver(observer)
 
   def addGameWinnerObserver(observer: Observer[GameWinnerSubject]) = gameWinnerSubject.addObserver(observer)
 
   protected def changeMaterial(chip: ChipView2D): Unit = chip.fill = colorMap(activeChip)
-  protected def dropHeight(dropHeight: Int): Double =     dropHeight * fieldHeight
+
+  protected def dropHeight(dropHeight: Int): Double = dropHeight * fieldHeight
 
 }
 

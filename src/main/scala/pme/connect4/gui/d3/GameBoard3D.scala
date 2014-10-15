@@ -23,7 +23,7 @@ class GameBoard3D extends Group with GameBoard[ChipView3D, SpotView3D] {
       translateX = -gameWidth / 2 + col * gameWidth / cols + chipRadius
       translateY = groundSize / 4
     }
-    chipView.onMousePressed = (me: MouseEvent) => content.add(handleChipSelected(col, chipView))
+    chipView.onMousePressed = (me: MouseEvent) => for(chipView <- handleChipSelected(col, chipView))content.add(chipView)
     chipView
   }
 
