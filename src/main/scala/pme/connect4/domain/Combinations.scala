@@ -12,25 +12,38 @@ object Combinations {
   def evalBestMove(game: Game, activeChip: Chip): Int = {
 
     def evalPointsForSlot(spot: Spot): Int = {
-      val combs = allCombinations(game, activeChip, spot).takeWhile(comb => !comb)
+      val combs = allCombinations(spot).takeWhile(comb => !comb)
       println(s"spot: $spot: ${combs.toList}")
       combs.size
     }
+    def allCombinations(spot: Spot): Stream[Combination] = {
+      AllCombinations(game, activeChip, spot).asStream
+    }
+    def isALost(spot: Spot) = {
+      AllCombinations(game, activeChip, spot).isALost
+    }
+    def isAWin(spot: Spot) = {
+      AllCombinations(game, activeChip, spot).isAWin
+    }
+
     val pointsForSlots: List[(Int, Spot)] = for {
       slot <- game.slots
       spot <- slot.findFirstEmpty
     } yield evalPointsForSlot(spot) -> spot
-    val b = pointsForSlots.groupBy(entry => entry._1)
-    val chosenSpot = pointsForSlots.foldLeft((Int.MaxValue, None: Option[Spot]))((a, b) => if (a._1 > b._1) (b._1, Some(b._2)) else a)
-    println(s"chosenSpot: $chosenSpot")
-    chosenSpot._2 match {
-      case Some(spot: Spot) => spot.col
-      case None => throw new IllegalArgumentException
-    }
-  }
+    val allSpots = pointsForSlots.sortBy(entry => entry._1)
+      .map(entry => entry._2)
+      .filter(spot => game.findSpotInColAbove(spot) match {
+      case Some(spAbove) if !isAWin(spot) && isALost(spAbove) => false
+      case _ => true
+    })
 
-  def allCombinations(game: Game, activeChip: Chip, spot: Spot): Stream[Combination] = {
-    AllCombinations(game, activeChip, spot).asStream
+    allSpots match {
+      case Nil => throw new IllegalArgumentException
+      case head :: tail => head.col
+    }
+
+
+
   }
 
   case class AllCombinations(game: Game, activeChip: Chip, spot: Spot) {
@@ -45,10 +58,12 @@ object Combinations {
     }
 
     // HORIZONTAL
-    lazy val horWin: Combination = new HorCombination(winningChips).findChips(activeChip)
+    lazy val horWin = new HorCombination(winningChips).findChips(activeChip)
     lazy val horLost = new HorCombination(winningChips).findChips(activeChip.other)
     lazy val horLostWith2 = new HorWith2Combination(winningChips).findChips(activeChip.other)
-    lazy val horLostWith2AndSpace = new HorWith2Combination(winningChips+1).findChips(activeChip.other)
+    lazy val horLostWith2AndSpace = new HorWith2Combination(winningChips + 1).findChips(activeChip.other)
+    lazy val horOtherSpace5 = new HorWithSpaces(winningChips+1).findChips(activeChip)
+    lazy val horOtherSpace4 = new HorWithSpaces(winningChips).findChips(activeChip)
 
     class HorCombination(nrChips: Int) {
       private def minSpot(spot: Spot) = spot.col - nrChips + 1 max 0
@@ -56,8 +71,8 @@ object Combinations {
       private def maxSpot(spot: Spot) = spot.col + nrChips - 1 min cols - 1
 
       protected def neighbors: Iterable[IndexedSeq[Spot]] = {
-         (for {
-          attempt <- minSpot(spot) to maxSpot(spot) - (nrChips-1)
+        (for {
+          attempt <- minSpot(spot) to maxSpot(spot) - (nrChips - 1)
           col <- attempt until attempt + nrChips
           neighbor = game.slots(col).spots(spot.row)
         } yield {
@@ -73,14 +88,24 @@ object Combinations {
         neighbors.filter(spots => spots.count(_.chip == chip) == winningChips - 1).nonEmpty
       }
     }
+
     class HorWith2Combination(nrChips: Int) extends HorCombination(nrChips) {
 
-     override  def findChips(chip: Chip): Boolean = {
-       val a = neighbors.filter(spots => spots.count(_.chip == chip) == winningChips - 2)
-          a.filter(spots => List(spots.head.chip, spots.last.chip).forall(_ == SpaceChip))
-            .nonEmpty
+      override def findChips(chip: Chip): Boolean = {
+        neighbors.filter(spots => spots.count(_.chip == chip) == 2)
+        .filter(spots => List(spots.head.chip, spots.last.chip).forall(_ == SpaceChip))
+          .nonEmpty
       }
     }
+
+    class HorWithSpaces(nrChips: Int) extends HorCombination(nrChips) {
+
+      override def findChips(chip: Chip): Boolean = {
+        neighbors.filter(spots => spots.forall(_.chip == SpaceChip))
+       .nonEmpty
+      }
+    }
+
     // DIAGONAL up (from left-down to right-up)
     lazy val diagUpWin: Combination = DiagUpCombination().findChips(activeChip)
     lazy val diagUpLost = DiagUpCombination().findChips(activeChip.other)
@@ -105,8 +130,8 @@ object Combinations {
     abstract class DiagCombination {
       protected def minSpot: Spot = {
         def innerMinSpot(sp: Spot): Spot = {
-           if (sp.col == minCol || sp.row == minRow) sp
-            else innerMinSpot(game.retrieveSpot(sp.col - 1, sp.row - nextRowOffset))
+          if (sp.col == minCol || sp.row == minRow) sp
+          else innerMinSpot(game.retrieveSpot(sp.col - 1, sp.row - nextRowOffset))
         }
         innerMinSpot(spot)
       }
@@ -154,9 +179,15 @@ object Combinations {
     def asStream: Stream[Combination] = (
       horWin #:: vertWin #:: diagUpWin #:: diagDownWin // wins
         #:: horLost #:: vertLost #:: diagUpLost #:: diagDownLost #:: horLostWith2 #:: horLostWith2AndSpace // losts
-        #:: takeWhatever #:: empty // other
+        #:: horOtherSpace5 #:: horOtherSpace4 #:: takeWhatever #:: empty // other
       )
 
+    def isALost = {
+      horLost || vertLost || diagUpLost || diagDownLost || horLostWith2 || horLostWith2AndSpace
+    }
+    def isAWin = {
+      horWin || vertWin || diagUpWin || diagDownWin
+    }
 
   }
 

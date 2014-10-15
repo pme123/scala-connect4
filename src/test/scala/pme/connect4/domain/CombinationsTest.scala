@@ -183,7 +183,26 @@ class CombinationsTest extends FeatureTester {
       assert(success)
     }
   }
-
+  feature("Evaluate the Horizontal Other with 4 spaces.") {
+    scenario("Only 3 spaces [?][ ][ ][y]. No success.") {
+      Given("A game without Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(3, YellowChip)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horOtherSpace4
+      Then("It should not succeed.")
+      assert(!success)
+    }
+    scenario("4 spaces [?][ ][ ][ ][y]. Success.") {
+      Given("A game without Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(4, YellowChip)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horOtherSpace4
+      Then("It should succeed.")
+      assert(success)
+    }
+  }
   // Diagonal up (from left-down to right-up)
   feature("Evaluate the Diagonal up Win") {
     scenario("1. col on a row. No Win.") {
