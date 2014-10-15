@@ -12,7 +12,7 @@ import scalafx.stage.Stage
 /**
  * Created by pascal.mengelt on 29.09.2014.
  */
-class ControlPane2D(gameBoard: GameBoard) extends HBox with Observer[GameStartedSubject] {
+class ControlPane2D(gameBoard: GameBoard2D) extends HBox with Observer[GameStartedSubject] {
 
   import pme.connect4.gui.GuiGameConfig2D._
 

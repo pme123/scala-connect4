@@ -28,7 +28,7 @@ object ConnectFour2D extends JFXApp {
     content = Seq(controlPane, gameBoard, infoPanel)
   }
 
-  lazy val gameBoard = new GameBoard
+  lazy val gameBoard = new GameBoard2D
 
 
   lazy val controlPane = new ControlPane2D(gameBoard)

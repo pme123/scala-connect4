@@ -26,8 +26,10 @@ class GameBoard3D extends Group with GeneralGameBoard[ChipView3D, SpotView3D] {
     chipView.onMousePressed = (me: MouseEvent) => content.add(handleChipSelected(col, chipView))
     chipView
   }
+
   override protected def changeMaterial(chip: ChipView3D): Unit = chip.material = materialMap(activeChip)
 
 
+  protected def dropHeight(dropHeight: Int): Double = -dropHeight * groundSize / 2 / (rows + 1)
 
 }

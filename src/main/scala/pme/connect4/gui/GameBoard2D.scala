@@ -15,7 +15,7 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape._
 import scalafx.util.Duration
 
-class GameBoard extends Pane with GeneralGameBoard[ChipView, SpotView] {
+class GameBoard2D extends Pane with GeneralGameBoard[ChipView, SpotView] {
 
 
   override def startNewGame() = {
@@ -116,7 +116,9 @@ class GameBoard extends Pane with GeneralGameBoard[ChipView, SpotView] {
 
   def addGameWinnerObserver(observer: Observer[GameWinnerSubject]) = gameWinnerSubject.addObserver(observer)
 
-  override protected def changeMaterial(chip: ChipView): Unit = chip.fill = colorMap(activeChip)
+  protected def changeMaterial(chip: ChipView): Unit = chip.fill = colorMap(activeChip)
+  protected def dropHeight(dropHeight: Int): Double =     dropHeight * fieldHeight
+
 }
 
 class GameStartedSubject extends Subject[GameStartedSubject] {

@@ -45,11 +45,11 @@ trait GeneralGameBoard[TC <: GeneralChipView,TS <: GeneralSpotView] {
 
   def dropChipView(col: Int): TC = {
     val newChip = createChip(col)
-    val dropHeight = rows - fourConnect.findFirstTakenSpot(col).get.row
+    val dropChipsCount = rows - fourConnect.findFirstTakenSpot(col).get.row
     val transition = new TranslateTransition {
       duration = Duration(1000)
       node = newChip
-      byY = dropHeight * fieldHeight
+      byY = dropHeight(dropChipsCount)
     }
     transition.play()
 //    verifyTurn()
@@ -57,6 +57,8 @@ trait GeneralGameBoard[TC <: GeneralChipView,TS <: GeneralSpotView] {
 //    runNextTurn()
     newChip
   }
+
+  protected def dropHeight(dropHeight: Int): Double
 
   def switchPlayer(): Unit = {
     activeChip = activeChip.other

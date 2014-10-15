@@ -10,7 +10,7 @@ import scalafx.scene.layout.AnchorPane
 /**
  * Created by pascal.mengelt on 29.09.2014.
  */
-class InfoPane2D(gameBoard: GameBoard) extends AnchorPane {
+class InfoPane2D(gameBoard: GameBoard2D) extends AnchorPane {
 
   import pme.connect4.gui.GuiGameConfig2D._
 
