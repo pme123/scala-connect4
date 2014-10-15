@@ -15,7 +15,7 @@ class CombinationsTest extends FeatureTester {
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertWin
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
     scenario("(winningChips-1). row in a Slot. No Win.") {
@@ -24,7 +24,7 @@ class CombinationsTest extends FeatureTester {
       for (i <- 1 until winningChips - 1) game.dropChip(0, RedChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertWin
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
     scenario("(winningChips). row in a Slot. Win!") {
@@ -33,7 +33,7 @@ class CombinationsTest extends FeatureTester {
       for (i <- 1 until winningChips) game.dropChip(0, RedChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertWin
-      Then("It should succed.")
+      Then("It should succeed.")
       assert(success)
     }
   }
@@ -44,7 +44,7 @@ class CombinationsTest extends FeatureTester {
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertLost
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
     scenario("(winningChips-1). row in a Slot. No Lost.") {
@@ -53,7 +53,7 @@ class CombinationsTest extends FeatureTester {
       for (i <- 1 until winningChips - 1) game.dropChip(0, RedChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertLost
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
     scenario("(winningChips). row in a Slot. Lost!") {
@@ -62,7 +62,7 @@ class CombinationsTest extends FeatureTester {
       for (i <- 1 until winningChips) game.dropChip(0, YellowChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).vertLost
-      Then("It should succed.")
+      Then("It should succeed.")
       assert(success)
     }
   }
@@ -73,7 +73,7 @@ class CombinationsTest extends FeatureTester {
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horWin
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
     scenario("(winningChips-1). col on a row. No Win.") {
@@ -82,7 +82,7 @@ class CombinationsTest extends FeatureTester {
       for (i <- 1 until winningChips - 1) game.dropChip(i, RedChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horWin
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
 
@@ -92,7 +92,7 @@ class CombinationsTest extends FeatureTester {
       for (i <- 1 until winningChips) game.dropChip(i, RedChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horWin
-      Then("It should succed.")
+      Then("It should succeed.")
       assert(success)
     }
   }
@@ -103,7 +103,7 @@ class CombinationsTest extends FeatureTester {
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLost
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
     scenario("(winningChips-1). col on a row. No Lost.") {
@@ -112,7 +112,7 @@ class CombinationsTest extends FeatureTester {
       for (i <- 1 until winningChips - 1) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLost
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
 
@@ -122,7 +122,7 @@ class CombinationsTest extends FeatureTester {
       for (i <- 1 until winningChips) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLost
-      Then("It should succed.")
+      Then("It should succeed.")
       assert(success)
     }
     scenario(s"Last chip is empty. Lost!") {
@@ -131,7 +131,7 @@ class CombinationsTest extends FeatureTester {
       for (i <- cols-winningChips until cols-1) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(cols-1).get).horLost
-      Then("It should succed.")
+      Then("It should succeed.")
       assert(success)
     }
   }
@@ -142,7 +142,7 @@ class CombinationsTest extends FeatureTester {
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLostWith2
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
     scenario("1 Chip - No Lost.") {
@@ -151,17 +151,35 @@ class CombinationsTest extends FeatureTester {
       game.dropChip(1, YellowChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLostWith2
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
-
+    scenario("2 Chips - No Lost.") {
+      Given("A game with [?][y][y][r]")
+      val game: Game = Game(cols, rows)
+      for (i <- 1 until winningChips-1) game.dropChip(i, YellowChip)
+      game.dropChip(winningChips-1, RedChip)
+      When("Evaluate the points for the first Slot(0)")
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLostWith2
+      Then("It should Not succeed.")
+      assert(!success)
+    }
     scenario("2 Chips - Lost.") {
       Given("A game with [?][y][y][ ]")
       val game: Game = Game(cols, rows)
       for (i <- 1 until winningChips-1) game.dropChip(i, YellowChip)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).horLostWith2
-      Then("It should succed.")
+      Then("It should succeed.")
+      assert(success)
+    }
+    scenario("2 Chips with spaces - Lost.") {
+      Given("A game with [ ][y][?][y][ ]")
+      val game: Game = Game(cols, rows)
+      game.dropChip(2, YellowChip)
+      game.dropChip(4, YellowChip)
+      val success = new AllCombinations(game, RedChip, game.findFirstEmpty(1).get).horLostWith2AndSpace
+      Then("It should succeed.")
       assert(success)
     }
   }
@@ -173,7 +191,7 @@ class CombinationsTest extends FeatureTester {
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagUpWin
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
     scenario("(winningChips-1). col and row. No Win.") {
@@ -185,7 +203,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagUpWin
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
 
@@ -199,7 +217,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the Slot(winningChips)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(winningChips-1).get).diagUpWin
-      Then("It should Not succed.")
+      Then("It should Not succeed.")
       assert(!success)
     }
     scenario("(winningChips). col and row with a Chip below. Win!") {
@@ -212,7 +230,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the Slot(winningChips)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(winningChips).get).diagUpWin
-      Then("It should succed.")
+      Then("It should succeed.")
       assert(success)
     }
     scenario("(winningChips). col and row. Win!") {
@@ -224,7 +242,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagUpWin
-      Then("It should succed.")
+      Then("It should succeed.")
       assert(success)
     }
   }
@@ -235,7 +253,7 @@ class CombinationsTest extends FeatureTester {
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(0).get).diagUpLost
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
     scenario("(winningChips-1). col and row. No Lost.") {
@@ -247,7 +265,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(0).get).diagUpLost
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
 
@@ -261,7 +279,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the Slot(winningChips)")
       val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(winningChips-1).get).diagUpLost
-      Then("It should NOT succed.")
+      Then("It should NOT succeed.")
       assert(!success)
     }
     scenario("(winningChips). col and row with a Chip below. Lost!") {
@@ -273,7 +291,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the Slot(winningChips)")
       val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(winningChips).get).diagUpLost
-      Then("It should NOT succed.")
+      Then("It should NOT succeed.")
       assert(!success)
     }
     scenario("(winningChips). col and row. Lost!") {
@@ -285,7 +303,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(0).get).diagUpLost
-      Then("It should succed.")
+      Then("It should succeed.")
       assert(success)
     }
   }
@@ -297,7 +315,7 @@ class CombinationsTest extends FeatureTester {
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagUpWin
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
     scenario("(winningChips-1). col and row. No Win.") {
@@ -309,7 +327,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagDownWin
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
 
@@ -322,7 +340,7 @@ class CombinationsTest extends FeatureTester {
       }
       When(s"Evaluate the points for the Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagDownWin
-      Then("It should Not succed.")
+      Then("It should Not succeed.")
       assert(!success)
     }
     scenario("(winningChips). col and row with a Chip below. Win!") {
@@ -335,7 +353,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the Slot(winningChips)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(0).get).diagDownWin
-      Then("It should succed.")
+      Then("It should succeed.")
       assert(success)
     }
     scenario("(winningChips). col and row. Win!") {
@@ -347,7 +365,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, RedChip, game.findFirstEmpty(winningChips).get).diagDownWin
-      Then("It should succed.")
+      Then("It should succeed.")
       assert(success)
     }
   }
@@ -358,7 +376,7 @@ class CombinationsTest extends FeatureTester {
       val game: Game = Game(cols, rows)
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(0).get).diagDownLost
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
     scenario("(winningChips-1). col and row. No Lost.") {
@@ -370,7 +388,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(0).get).diagDownLost
-      Then("It should not succed.")
+      Then("It should not succeed.")
       assert(!success)
     }
 
@@ -383,7 +401,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the Slot(winningChips)")
       val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(winningChips-1).get).diagDownLost
-      Then("It should NOT succed.")
+      Then("It should NOT succeed.")
       assert(!success)
     }
     scenario("(winningChips). col and row with a Chip below. Lost!") {
@@ -396,7 +414,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the Slot(0)")
       val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(0).get).diagDownLost
-      Then("It should succed.")
+      Then("It should succeed.")
       assert(success)
     }
     scenario(s"$winningChips. col and row. Lost!") {
@@ -408,7 +426,7 @@ class CombinationsTest extends FeatureTester {
       }
       When("Evaluate the points for the first Slot(0)")
       val success = new AllCombinations(game, YellowChip, game.findFirstEmpty(winningChips).get).diagDownLost
-      Then("It should succed.")
+      Then("It should succeed.")
       assert(success)
     }
   }
@@ -482,6 +500,16 @@ class CombinationsTest extends FeatureTester {
       Then("It should take the horizontal Lost with 2 chips.")
       assert(evalCol === 1)
     }
+    scenario("A horizontal Lost with 2 chips and Space.") {
+      Given("A game with 2 other Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(2, YellowChip)
+      game.dropChip(4, YellowChip)
+      When("Evaluate the best Slot.")
+      val evalCol = evalBestMove(game, RedChip)
+      Then("It should take the horizontal Lost with 2 chips.")
+      assert(evalCol === 1)
+    }
     scenario("A horizontal Win and vertical Lost.") {
       Given("A game with other Chips")
       val game: Game = Game(cols, rows)
@@ -520,5 +548,21 @@ class CombinationsTest extends FeatureTester {
       Then("It should take the diagonal down Win.")
       assert(evalCol === winningChips)
     }
+
+    scenario("Takes default but in the row above there is a lost.") {
+      Given("A game with other Chips")
+      val game: Game = Game(cols, rows)
+      game.dropChip(1, RedChip)
+      game.dropChip(2, YellowChip)
+      game.dropChip(3, RedChip)
+      for (i <- 1 until winningChips) {
+        game.dropChip(i, YellowChip)
+      }
+      When("Evaluate the best Slot.")
+      val evalCol = evalBestMove(game, RedChip)
+      Then("It should not take the 0.")
+      assert(evalCol != 0)
+    }
   }
+
 }

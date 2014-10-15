@@ -20,6 +20,7 @@ object Combinations {
       slot <- game.slots
       spot <- slot.findFirstEmpty
     } yield evalPointsForSlot(spot) -> spot
+    val b = pointsForSlots.groupBy(entry => entry._1)
     val chosenSpot = pointsForSlots.foldLeft((Int.MaxValue, None: Option[Spot]))((a, b) => if (a._1 > b._1) (b._1, Some(b._2)) else a)
     println(s"chosenSpot: $chosenSpot")
     chosenSpot._2 match {
@@ -44,39 +45,40 @@ object Combinations {
     }
 
     // HORIZONTAL
-    lazy val horWin: Combination = new HorCombination().findChips(activeChip)
-    lazy val horLost = new HorCombination().findChips(activeChip.other)
-    lazy val horLostWith2 = new HorWith2Combination().findChips(activeChip.other)
+    lazy val horWin: Combination = new HorCombination(winningChips).findChips(activeChip)
+    lazy val horLost = new HorCombination(winningChips).findChips(activeChip.other)
+    lazy val horLostWith2 = new HorWith2Combination(winningChips).findChips(activeChip.other)
+    lazy val horLostWith2AndSpace = new HorWith2Combination(winningChips+1).findChips(activeChip.other)
 
-    class HorCombination {
-      private def minSpot(spot: Spot) = spot.col - winningChips + 1 max 0
+    class HorCombination(nrChips: Int) {
+      private def minSpot(spot: Spot) = spot.col - nrChips + 1 max 0
 
-      private def maxSpot(spot: Spot) = spot.col + winningChips - 1 min cols - 1
+      private def maxSpot(spot: Spot) = spot.col + nrChips - 1 min cols - 1
 
-      protected val neighbors: Iterable[IndexedSeq[Spot]] = {
-        val a = (for {
-          attempt <- minSpot(spot) to maxSpot(spot) - (winningChips-1)
-          col <- attempt until attempt + winningChips
+      protected def neighbors: Iterable[IndexedSeq[Spot]] = {
+         (for {
+          attempt <- minSpot(spot) to maxSpot(spot) - (nrChips-1)
+          col <- attempt until attempt + nrChips
           neighbor = game.slots(col).spots(spot.row)
         } yield {
           (attempt, neighbor)
         })
           .groupBy(neighbor => neighbor._1)
-          a.values
+          .values
           .map(attempt => attempt.map(entry => entry._2))
-          .filter(_.size == winningChips)
+          .filter(_.size == nrChips)
       }
 
       protected[domain] def findChips(chip: Chip): Boolean = {
         neighbors.filter(spots => spots.count(_.chip == chip) == winningChips - 1).nonEmpty
       }
     }
-    class HorWith2Combination extends HorCombination {
+    class HorWith2Combination(nrChips: Int) extends HorCombination(nrChips) {
 
      override  def findChips(chip: Chip): Boolean = {
        val a = neighbors.filter(spots => spots.count(_.chip == chip) == winningChips - 2)
-          .filter(spots => List(spots.head.chip, spots.last.chip).forall(_ == SpaceChip))
-           a .nonEmpty
+          a.filter(spots => List(spots.head.chip, spots.last.chip).forall(_ == SpaceChip))
+            .nonEmpty
       }
     }
     // DIAGONAL up (from left-down to right-up)
@@ -151,7 +153,7 @@ object Combinations {
 
     def asStream: Stream[Combination] = (
       horWin #:: vertWin #:: diagUpWin #:: diagDownWin // wins
-        #:: horLost #:: vertLost #:: diagUpLost #:: diagDownLost #:: horLostWith2 // losts
+        #:: horLost #:: vertLost #:: diagUpLost #:: diagDownLost #:: horLostWith2 #:: horLostWith2AndSpace // losts
         #:: takeWhatever #:: empty // other
       )
 
