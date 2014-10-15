@@ -3,7 +3,7 @@ package pme.connect4.gui.d3
 
 import pme.connect4.domain.{ConnectFourGame, Chip, RedChip}
 import pme.connect4.domain.GameConfig._
-import pme.connect4.gui.ChipView._
+import pme.connect4.gui.ChipView2D._
 import pme.connect4.gui.d3.ConnectFourConfig3D._
 
 import scalafx.Includes._

@@ -2,13 +2,13 @@ package pme.connect4.gui
 
 import pme.connect4.domain.GameConfig._
 import pme.connect4.domain.{RedChip, Chip, ConnectFourGame}
-import pme.connect4.gui.ChipView._
+import pme.connect4.gui.ChipView2D._
 import pme.connect4.gui.GuiGameConfig2D._
 
 import scalafx.animation.TranslateTransition
 import scalafx.util.Duration
 
-trait GeneralGameBoard[TC <: GeneralChipView,TS <: GeneralSpotView] {
+trait GameBoard[TC <: ChipView,TS <: SpotView] {
   val gameStartedSubject = new GameStartedSubject
   val gameWinnerSubject = new GameWinnerSubject
 
@@ -35,7 +35,7 @@ trait GeneralGameBoard[TC <: GeneralChipView,TS <: GeneralSpotView] {
   protected def createChip(col: Int): TC
   protected def initGameSpots: Seq[TS]
 
-  protected def handleChipSelected(col: Int, chip: GeneralChipView): TC = {
+  protected def handleChipSelected(col: Int, chip: ChipView): TC = {
     {
       fourConnect.dropChip(col, activeChip)
       if (!fourConnect.hasEmptySlot(col)) chip.setVisible(false)

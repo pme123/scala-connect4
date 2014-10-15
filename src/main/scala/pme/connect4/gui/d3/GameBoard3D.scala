@@ -1,7 +1,7 @@
 package pme.connect4.gui.d3
 
 import pme.connect4.domain.GameConfig._
-import pme.connect4.gui.GeneralGameBoard
+import pme.connect4.gui.GameBoard
 import pme.connect4.gui.d3.ChipView3D._
 import pme.connect4.gui.d3.ConnectFourConfig3D._
 
@@ -9,7 +9,7 @@ import scalafx.Includes._
 import scalafx.scene.Group
 import scalafx.scene.input.MouseEvent
 
-class GameBoard3D extends Group with GeneralGameBoard[ChipView3D, SpotView3D] {
+class GameBoard3D extends Group with GameBoard[ChipView3D, SpotView3D] {
 
   override def startNewGame() = {
     super.startNewGame()

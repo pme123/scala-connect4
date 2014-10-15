@@ -1,7 +1,7 @@
 package pme.connect4.gui.d3
 
 import pme.connect4.domain.{Chip, RedChip, YellowChip}
-import pme.connect4.gui.GeneralChipView
+import pme.connect4.gui.ChipView
 import pme.connect4.gui.d3.ChipView3D._
 import pme.connect4.gui.d3.ConnectFourConfig3D._
 
@@ -16,7 +16,7 @@ object ChipView3D {
 
 }
 
-class ChipView3D(chip: Chip) extends Cylinder(chipRadius, chipThickness) with GeneralChipView {
+class ChipView3D(chip: Chip) extends Cylinder(chipRadius, chipThickness) with ChipView {
   visible = true
   effect = new InnerShadow {
     offsetX = -3

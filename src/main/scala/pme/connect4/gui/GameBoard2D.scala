@@ -3,7 +3,7 @@ package pme.connect4.gui
 
 import pme.connect4.domain.GameConfig._
 import pme.connect4.domain._
-import pme.connect4.gui.ChipView._
+import pme.connect4.gui.ChipView2D._
 import pme.connect4.gui.GuiGameConfig2D._
 import pme.connect4.util.{Observer, Subject}
 
@@ -15,7 +15,7 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape._
 import scalafx.util.Duration
 
-class GameBoard2D extends Pane with GeneralGameBoard[ChipView, SpotView] {
+class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
 
 
   override def startNewGame() = {
@@ -23,8 +23,8 @@ class GameBoard2D extends Pane with GeneralGameBoard[ChipView, SpotView] {
     content = chipsToPlay ++ gameSpots
   }
 
-  def createChip(col: Int): ChipView = {
-    val chipView: ChipView = createChip(col, activeChip)
+  def createChip(col: Int): ChipView2D = {
+    val chipView: ChipView2D = createChip(col, activeChip)
     chipView.onMouseClicked = (me: MouseEvent) => content.add(handleChipSelected(col, chipView))
     chipView
   }
@@ -48,13 +48,13 @@ class GameBoard2D extends Pane with GeneralGameBoard[ChipView, SpotView] {
         radiusY = fieldHeight / 2 - 4 * slotMargin
       }
       val shape = Shape.subtract(rect, hole).asInstanceOf[javafx.scene.shape.Path]
-      new SpotView(fourConnect.game.slots(col).spots(verFieldCount - 1 - row), shape)
+      new SpotView2D(fourConnect.game.slots(col).spots(verFieldCount - 1 - row), shape)
     }
   }
 
 
-  def createChip(col: Int, chip: Chip): ChipView = {
-    val chipView: ChipView = new ChipView(chip) {
+  def createChip(col: Int, chip: Chip): ChipView2D = {
+    val chipView: ChipView2D = new ChipView2D(chip) {
       centerX = paneOffsetX + col * fieldWidth + fieldWidth / 2
       centerY = paneOffsetY - fieldHeight / 2
       radiusX = fieldWidth / 2 - 4 * slotMargin
@@ -116,7 +116,7 @@ class GameBoard2D extends Pane with GeneralGameBoard[ChipView, SpotView] {
 
   def addGameWinnerObserver(observer: Observer[GameWinnerSubject]) = gameWinnerSubject.addObserver(observer)
 
-  protected def changeMaterial(chip: ChipView): Unit = chip.fill = colorMap(activeChip)
+  protected def changeMaterial(chip: ChipView2D): Unit = chip.fill = colorMap(activeChip)
   protected def dropHeight(dropHeight: Int): Double =     dropHeight * fieldHeight
 
 }
