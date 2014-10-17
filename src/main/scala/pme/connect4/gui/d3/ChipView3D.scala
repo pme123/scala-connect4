@@ -1,5 +1,6 @@
 package pme.connect4.gui.d3
 
+import pme.connect4.domain.GameConfig._
 import pme.connect4.domain.{Chip, RedChip, YellowChip}
 import pme.connect4.gui.ChipView
 import pme.connect4.gui.d3.ChipView3D._
@@ -23,6 +24,7 @@ class ChipView3D(chip: Chip) extends Cylinder(chipRadius, chipThickness) with Ch
     offsetY = -3
     radius = 12
   }
+ translateY = gameOffsetY + (3+rows)*fieldHeight
   material = materialMap(chip)
   rotationAxis = Rotate.XAxis
   rotate = 90.0

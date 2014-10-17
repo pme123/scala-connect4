@@ -2,6 +2,7 @@ package pme.connect4.gui
 
 import pme.connect4.domain.GameConfig._
 import pme.connect4.domain.{Chip, Combinations, ConnectFourGame, RedChip}
+import pme.connect4.gui.ConnectFourConfig2D._
 
 import scalafx.animation.TranslateTransition
 import scalafx.util.Duration
@@ -34,7 +35,14 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
 
   protected def createChip(col: Int): TC
 
-  protected def initGameSpots: Seq[TS]
+  private def initGameSpots: Seq[TS] = {
+    for {
+      col <- 0 until horFieldCount
+      row <- 0 until verFieldCount
+    } yield createSpot(col, row)
+  }
+
+  protected def createSpot(col: Int, row: Int): TS
 
   protected def handleChipSelected(col: Int, chip: ChipView) = {
     fourConnect.dropChip(col, activeChip)
@@ -45,7 +53,7 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
   def dropChipView(col: Int): Unit = {
     val newChip = createChip(col)
     addNewChipView(newChip)
-    val dropChipsCount = rows - fourConnect.findFirstTakenSpot(col).get.row
+    val dropChipsCount = rows-fourConnect.findFirstTakenSpot(col).get.row
     val transition = new TranslateTransition {
       duration = Duration(1000)
       node = newChip

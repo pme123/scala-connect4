@@ -14,7 +14,7 @@ import scalafx.stage.Stage
  */
 class ControlPane2D(gameBoard: GameBoard2D) extends HBox with Observer[GameStartedSubject] {
 
-  import pme.connect4.gui.GuiGameConfig2D._
+  import pme.connect4.gui.ConnectFourConfig2D._
 
   val newGameButton = new Button {
     text = "Start new Game"

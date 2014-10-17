@@ -12,7 +12,7 @@ import scalafx.scene.layout.AnchorPane
  */
 class InfoPane2D(gameBoard: GameBoard2D) extends AnchorPane {
 
-  import pme.connect4.gui.GuiGameConfig2D._
+  import pme.connect4.gui.ConnectFourConfig2D._
 
   val info = new Label() {
     layoutX = paneOffsetX

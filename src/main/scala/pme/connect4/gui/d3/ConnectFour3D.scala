@@ -87,8 +87,8 @@ object ConnectFour3D extends JFXApp {
 
   private def buildGround() {
 
-    val ground = new Box(groundSize, groundSize / 4, groundSize) {
-      translateY = -groundSize / 2
+    val ground = new Box(groundSize, -gameOffsetY, groundSize) {
+      translateY = gameOffsetY-fieldHeight
       material = groundMaterial
     }
 

@@ -1,9 +1,11 @@
 package pme.connect4.gui
 
 
+import javafx.scene.shape.Path
+
 import pme.connect4.domain._
 import pme.connect4.gui.ChipView2D._
-import pme.connect4.gui.GuiGameConfig2D._
+import pme.connect4.gui.ConnectFourConfig2D._
 import pme.connect4.util.{Observer, Subject}
 
 import scalafx.Includes._
@@ -26,29 +28,6 @@ class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
     chipView
   }
 
-  def initGameSpots = {
-    for {
-      col <- 0 until horFieldCount
-      row <- 0 until verFieldCount
-    } yield {
-      val rect = new Rectangle {
-        x = paneOffsetX + col * fieldWidth + slotMargin
-        y = paneOffsetY + row * fieldHeight + slotMargin
-        width = fieldWidth - 2 * slotMargin
-        height = fieldHeight - 2 * slotMargin
-        fill = Color.DeepSkyBlue
-      }
-      val hole = new Ellipse() {
-        centerX = paneOffsetX + col * fieldWidth + fieldWidth / 2
-        centerY = paneOffsetY + row * fieldHeight + fieldHeight / 2
-        radiusX = fieldWidth / 2 - 4 * slotMargin
-        radiusY = fieldHeight / 2 - 4 * slotMargin
-      }
-      val shape = Shape.subtract(rect, hole).asInstanceOf[javafx.scene.shape.Path]
-      new SpotView2D(fourConnect.game.slots(col).spots(verFieldCount - 1 - row), shape)
-    }
-  }
-
   def createChip(col: Int, chip: Chip): ChipView2D = {
     val chipView: ChipView2D = new ChipView2D(chip) {
       centerX = paneOffsetX + col * fieldWidth + fieldWidth / 2
@@ -59,6 +38,24 @@ class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
 
     }
     chipView
+  }
+  protected def createSpot(col: Int, row: Int): SpotView2D = {
+
+    val rect = new Rectangle {
+      x = paneOffsetX + col * fieldWidth + slotMargin
+      y = paneOffsetY + row * fieldHeight + slotMargin
+      width = fieldWidth - 2 * slotMargin
+      height = fieldHeight - 2 * slotMargin
+      fill = Color.DeepSkyBlue
+    }
+    val hole = new Ellipse() {
+      centerX = paneOffsetX + col * fieldWidth + fieldWidth / 2
+      centerY = paneOffsetY + row * fieldHeight + fieldHeight / 2
+      radiusX = fieldWidth / 2 - 4 * slotMargin
+      radiusY = fieldHeight / 2 - 4 * slotMargin
+    }
+    val shape = Shape.subtract(rect, hole).asInstanceOf[Path]
+    new SpotView2D(fourConnect.game.slots(col).spots(verFieldCount - 1 - row), shape)
   }
 
   def addGameStartedObserver(observer: Observer[GameStartedSubject]) = gameStartedSubject.addObserver(observer)

@@ -10,7 +10,7 @@ import scalafx.stage.PopupWindow
 
 object ConnectFour2D extends JFXApp {
 
-  import pme.connect4.gui.GuiGameConfig2D._
+  import pme.connect4.gui.ConnectFourConfig2D._
 
 
 

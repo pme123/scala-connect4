@@ -1,13 +1,14 @@
 package pme.connect4.gui.d3
 
 import pme.connect4.domain.GameConfig._
-import pme.connect4.gui.{ChipView2D, GameBoard}
+import pme.connect4.gui.GameBoard
 import pme.connect4.gui.d3.ChipView3D._
 import pme.connect4.gui.d3.ConnectFourConfig3D._
 
 import scalafx.Includes._
 import scalafx.scene.Group
 import scalafx.scene.input.MouseEvent
+import scalafx.scene.transform.{Translate, Rotate}
 
 class GameBoard3D extends Group with GameBoard[ChipView3D, SpotView3D] {
 
@@ -16,20 +17,23 @@ class GameBoard3D extends Group with GameBoard[ChipView3D, SpotView3D] {
     content = chipsToPlay ++ gameSpots
   }
 
-  override protected def initGameSpots: Seq[SpotView3D] = Nil
 
-  override protected def createChip(col: Int): ChipView3D = {
+  protected def createChip(col: Int): ChipView3D = {
     val chipView: ChipView3D = new ChipView3D(activeChip) {
-      translateX = -gameWidth / 2 + col * gameWidth / cols + chipRadius
-      translateY = groundSize / 4
+      translateX = SpotView3D.calcOffsetX(col)
     }
     chipView.onMousePressed = (me: MouseEvent) => handleChipSelected(col, chipView)
     chipView
   }
-
-  override protected def changeMaterial(chip: ChipView3D): Unit = chip.material = materialMap(activeChip)
+  protected def createSpot(col: Int, row: Int): SpotView3D = {
+    val spot = new SpotView3D(fourConnect.game.slots(col).spots(row), SpotView3D.createSpotView(col,row))
+    spot.transforms.add(new Translate(0,0,6));
+    spot
+  }
+   protected def changeMaterial(chip: ChipView3D): Unit = chip.material = materialMap(activeChip)
 
   protected def addNewChipView(newChip: ChipView3D): Unit = content.add(newChip)
-  protected def dropHeight(dropHeight: Int): Double = -dropHeight * groundSize / 2 / (rows + 1)
+
+  protected def dropHeight(dropHeight: Int): Double = -2*chipRadius-SpotView3D.calcOffsetY(dropHeight)
 
 }
