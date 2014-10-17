@@ -8,13 +8,13 @@ import pme.connect4.gui.d3.ConnectFourConfig3D._
 import scalafx.Includes._
 import scalafx.scene.Group
 import scalafx.scene.input.MouseEvent
-import scalafx.scene.transform.{Translate, Rotate}
+import scalafx.scene.transform.Translate
 
 class GameBoard3D extends Group with GameBoard[ChipView3D, SpotView3D] {
 
   override def startNewGame() = {
     super.startNewGame()
-    content = chipsToPlay ++ gameSpots
+    content = chipsToPlay ++ gameSpots.values
   }
 
 
@@ -27,13 +27,13 @@ class GameBoard3D extends Group with GameBoard[ChipView3D, SpotView3D] {
   }
   protected def createSpot(col: Int, row: Int): SpotView3D = {
     val spot = new SpotView3D(fourConnect.game.slots(col).spots(row), SpotView3D.createSpotView(col,row))
-    spot.transforms.add(new Translate(0,0,6));
+
     spot
   }
    protected def changeMaterial(chip: ChipView3D): Unit = chip.material = materialMap(activeChip)
 
   protected def addNewChipView(newChip: ChipView3D): Unit = content.add(newChip)
 
-  protected def dropHeight(dropHeight: Int): Double = -2*chipRadius-SpotView3D.calcOffsetY(dropHeight)
+  protected def dropHeight(spotView: SpotView3D): Double =  (rows-spotView.getSpot.row)*fieldHeight
 
 }

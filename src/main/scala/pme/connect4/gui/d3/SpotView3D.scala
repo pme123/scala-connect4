@@ -6,27 +6,42 @@ import pme.connect4.domain.Spot
 import pme.connect4.gui.d3.ConnectFourConfig3D._
 import pme.connect4.gui.{SpotView2D, SpotView}
 
+import scala.collection.immutable.IndexedSeq
+import scalafx.scene.transform.Translate
 import scalafx.scene.{Node, Group}
 import scalafx.scene.paint.Color
 import scalafx.scene.shape._
 
 object SpotView3D {
   def createSpotView(col:Int, row:Int): javafx.scene.shape.Path =   {
-    val rect = new Rectangle {
+    def createOneField(offset: Int): shape.Path = {
+      val path: shape.Path = javafx.scene.shape.Shape.subtract(rect, hole).asInstanceOf[shape.Path]
+      path.setTranslateZ(chipThickness * offset)
+      path
+    }
+
+    def rect = new Rectangle {
       translateX = calcOffsetX(col)-fieldWidth/2
       translateY = calcOffsetY(row)-fieldWidth/2
       width = fieldWidth
       height = fieldHeight
       fill = Color.Blue
+
     }
-    val hole = new Ellipse() {
+    def hole = new Ellipse() {
       centerX = calcOffsetX(col)
       centerY = calcOffsetY(row)
       radiusX = chipRadius
       radiusY = chipRadius
     }
-    javafx.scene.shape.Shape.subtract(rect, hole).asInstanceOf[javafx.scene.shape.Path]
+
+    val paths: IndexedSeq[shape.Shape] = for(i <- -1 to 1)yield createOneField(i)
+    paths.foldRight(Sh)
+    javafx.scene.shape.Shape.union(paths)
+    path
   }
+
+
 
   def calcOffsetX(col: Int): Double = {
     gameOffsetX + col * fieldWidth

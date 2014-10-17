@@ -2,7 +2,7 @@ package pme.connect4.gui
 
 
 import javafx.scene.shape.Path
-
+import pme.connect4.domain.GameConfig._
 import pme.connect4.domain._
 import pme.connect4.gui.ChipView2D._
 import pme.connect4.gui.ConnectFourConfig2D._
@@ -19,7 +19,7 @@ class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
 
   override def startNewGame() = {
     super.startNewGame()
-    content = chipsToPlay ++ gameSpots
+    content = chipsToPlay ++ gameSpots.values
   }
 
   def createChip(col: Int): ChipView2D = {
@@ -64,7 +64,7 @@ class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
 
   protected def changeMaterial(chip: ChipView2D): Unit = chip.fill = colorMap(activeChip)
 
-  protected def dropHeight(dropHeight: Int): Double = dropHeight * fieldHeight
+  protected def dropHeight(spotView: SpotView2D): Double = (rows-spotView.getSpot.row) * fieldHeight
 
   protected def addNewChipView(newChip: ChipView2D): Unit = content.add(newChip)
 }

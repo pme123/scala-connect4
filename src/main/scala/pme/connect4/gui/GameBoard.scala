@@ -1,8 +1,10 @@
 package pme.connect4.gui
 
 import pme.connect4.domain.GameConfig._
-import pme.connect4.domain.{Chip, Combinations, ConnectFourGame, RedChip}
+import pme.connect4.domain._
 import pme.connect4.gui.ConnectFourConfig2D._
+import pme.connect4.gui.ConnectFourConfig2D.fieldHeight
+import pme.connect4.gui.d3.ConnectFourConfig3D._
 
 import scalafx.animation.TranslateTransition
 import scalafx.util.Duration
@@ -13,7 +15,7 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
 
   var fourConnect:ConnectFourGame = null
   var chipsToPlay: Seq[TC] = Nil
-  var gameSpots: Seq[TS] = Nil
+  var gameSpots: Map[(Int,Int), TS] = Map()
   var activeChip: Chip = RedChip
   var playAloneMode: Boolean = false
   var myChip: Chip = activeChip.other
@@ -35,11 +37,14 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
 
   protected def createChip(col: Int): TC
 
-  private def initGameSpots: Seq[TS] = {
-    for {
+  private def initGameSpots: Map[(Int,Int), TS] = {
+    (for {
       col <- 0 until horFieldCount
       row <- 0 until verFieldCount
-    } yield createSpot(col, row)
+    } yield {
+      val spotView = createSpot(col, row)
+      (spotView.getSpot.col, spotView.getSpot.row) -> spotView
+    }).toMap
   }
 
   protected def createSpot(col: Int, row: Int): TS
@@ -53,11 +58,13 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
   def dropChipView(col: Int): Unit = {
     val newChip = createChip(col)
     addNewChipView(newChip)
-    val dropChipsCount = rows-fourConnect.findFirstTakenSpot(col).get.row
+    val spot: Spot = fourConnect.findFirstTakenSpot(col).get
+    val spotView = gameSpots(spot.col, spot.row)
+    val distance =dropHeight(spotView)
     val transition = new TranslateTransition {
-      duration = Duration(1000)
+      duration = Duration(distance/fieldHeight*100)
       node = newChip
-      byY = dropHeight(dropChipsCount)
+      byY = -distance
     }
     transition.play()
     verifyTurn()
@@ -66,14 +73,14 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
   }
   protected def addNewChipView(newChip: TC)
 
-  protected def dropHeight(dropHeight: Int): Double
+  protected def dropHeight(spotView: TS): Double
 
   def verifyTurn() = {
     if (!gameStartedSubject.gameStarted) startGame()
     val winners = fourConnect.winningSpots(activeChip)
 
     for {
-      spotView <- gameSpots
+      (spot,spotView) <- gameSpots
       winner <- winners
       spot <- winner
       if spot.col == spotView.getSpot.col && spot.row == spotView.getSpot.row
