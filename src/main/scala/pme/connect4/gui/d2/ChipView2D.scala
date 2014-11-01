@@ -1,12 +1,11 @@
-package pme.connect4.gui
+package pme.connect4.gui.d2
 
-import pme.connect4.domain.{YellowChip, RedChip, Chip}
+import pme.connect4.domain.{Chip, RedChip, YellowChip}
+import pme.connect4.gui.ChipView
 
-import scalafx.animation.{Timeline, FadeTransition}
 import scalafx.scene.effect.InnerShadow
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Ellipse
-import scalafx.util.Duration
 
 /**
  * Created by mengelpa on 24.09.14.

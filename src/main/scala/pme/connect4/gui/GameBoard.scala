@@ -2,8 +2,7 @@ package pme.connect4.gui
 
 import pme.connect4.domain.GameConfig._
 import pme.connect4.domain._
-import pme.connect4.gui.ConnectFourConfig2D.{fieldHeight, _}
-import pme.connect4.util.Observer
+import pme.connect4.util.{Subject, Observer}
 
 import scalafx.animation.TranslateTransition
 import scalafx.scene.Node
@@ -39,8 +38,8 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] extends Node {
 
   private def initGameSpots: Map[(Int,Int), TS] = {
     (for {
-      col <- 0 until horFieldCount
-      row <- 0 until verFieldCount
+      col <- 0 until cols
+      row <- 0 until rows
     } yield {
       val spotView = createSpot(col, row)
       (spotView.getSpot.col, spotView.getSpot.row) -> spotView
@@ -62,7 +61,7 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] extends Node {
     val spotView = gameSpots(spot.col, spot.row)
     val distance =dropHeight(spotView)
     val transition = new TranslateTransition {
-      duration = Duration(Math.abs(distance)/fieldHeight*100)
+      duration = Duration(Math.abs(distance))
       node = newChip
       byY = distance
     }
@@ -129,5 +128,35 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] extends Node {
   def addGameStartedObserver(observer: Observer[GameStartedSubject]) = gameStartedSubject.addObserver(observer)
 
   def addGameWinnerObserver(observer: Observer[GameWinnerSubject]) = gameWinnerSubject.addObserver(observer)
+
+}
+class GameStartedSubject extends Subject[GameStartedSubject] {
+  var gameStarted = false
+
+  protected[gui] def startGame() = {
+    gameStarted = true
+    notifyObservers()
+  }
+
+  protected[gui] def finishGame() = {
+    gameStarted = false
+    notifyObservers()
+  }
+
+}
+
+class GameWinnerSubject extends Subject[GameWinnerSubject] {
+  var gameWinner: Chip = SpaceChip
+
+  protected[gui] def isFinish = gameWinner != SpaceChip
+
+  protected[gui] def startGame() = {
+    gameWinner = SpaceChip
+  }
+
+  protected[gui] def finishGame(winner: Chip) = {
+    gameWinner = winner
+    notifyObservers()
+  }
 
 }

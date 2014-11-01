@@ -1,6 +1,7 @@
-package pme.connect4.gui
+package pme.connect4.gui.d2
 
 import pme.connect4.domain.Spot
+import pme.connect4.gui.SpotView
 
 import scalafx.scene.shape.Path
 

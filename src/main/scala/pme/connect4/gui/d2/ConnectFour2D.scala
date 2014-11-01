@@ -1,4 +1,6 @@
-package pme.connect4.gui
+package pme.connect4.gui.d2
+
+import pme.connect4.gui._
 
 import scalafx.application.JFXApp
 import scalafx.scene.Scene
@@ -7,7 +9,7 @@ import scalafx.scene.paint.Color
 
 object ConnectFour2D extends JFXApp {
 
-  import pme.connect4.gui.ConnectFourConfig2D._
+  import pme.connect4.gui.d2.ConnectFourConfig2D._
 
 
 

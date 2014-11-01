@@ -8,12 +8,10 @@ import scalafx.scene.layout.AnchorPane
 
 class InfoPane(gameBoard: GameBoard[_ <: ChipView,_ <: SpotView]) extends AnchorPane {
 
-  import pme.connect4.gui.ConnectFourConfig2D._
+  import pme.connect4.gui.ConnectFourConfig._
 
   val info = new Label() {
     layoutX = paneOffsetX
-    minWidth = boardWidth / 2
-    prefWidth = boardWidth / 2
     text = "Welcome  to  4-Connect!"
  
   }

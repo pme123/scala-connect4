@@ -5,13 +5,11 @@ import javafx.event.{ActionEvent, EventHandler}
 import pme.connect4.util.Observer
 
 import scalafx.geometry.Insets
-import scalafx.scene.control.{CheckBox, Button}
-import scalafx.scene.layout.{HBox, AnchorPane}
+import scalafx.scene.control.{Button, CheckBox}
+import scalafx.scene.layout.HBox
 import scalafx.stage.Stage
 
-/**
- * Created by pascal.mengelt on 29.09.2014.
- */
+
 class ControlPane(gameBoard: GameBoard[_ <: ChipView, _ <: SpotView]) extends HBox with Observer[GameStartedSubject] {
 
 //  import pme.connect4.gui.ConnectFourConfig2D._
@@ -23,7 +21,7 @@ class ControlPane(gameBoard: GameBoard[_ <: ChipView, _ <: SpotView]) extends HB
       override def handle(event: ActionEvent) {
         changeColorButton.disable = false
         playAloneCheckBox.disable = false
-        gameBoard.startNewGame
+        gameBoard.startNewGame()
       }
     }
   }
@@ -31,7 +29,7 @@ class ControlPane(gameBoard: GameBoard[_ <: ChipView, _ <: SpotView]) extends HB
     text = "Change Color"
     onAction = new EventHandler[ActionEvent] {
       override def handle(event: ActionEvent) {
-        gameBoard.switchPlayer
+        gameBoard.switchPlayer()
       }
     }
   }
@@ -49,10 +47,10 @@ class ControlPane(gameBoard: GameBoard[_ <: ChipView, _ <: SpotView]) extends HB
     title = "Error Message"
 
   }
-  val okButton = new Button("Ok");
+  val okButton = new Button("Ok")
   okButton.setOnAction(new EventHandler[ActionEvent] {
     override def handle(event: ActionEvent) {
-      myDialog.close
+      myDialog.close()
     }
   })
 

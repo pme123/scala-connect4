@@ -1,13 +1,12 @@
-package pme.connect4.gui
-
+package pme.connect4.gui.d2
 
 import javafx.scene.shape.Path
 
 import pme.connect4.domain.GameConfig._
 import pme.connect4.domain._
-import pme.connect4.gui.ChipView2D._
-import pme.connect4.gui.ConnectFourConfig2D._
-import pme.connect4.util.Subject
+import pme.connect4.gui.GameBoard
+import pme.connect4.gui.d2.ChipView2D._
+import pme.connect4.gui.d2.ConnectFourConfig2D._
 
 import scalafx.Includes._
 import scalafx.scene.input.MouseEvent
@@ -56,7 +55,7 @@ class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
       radiusY = fieldHeight / 2 - 4 * slotMargin
     }
     val shape = Shape.subtract(rect, hole).asInstanceOf[Path]
-    new SpotView2D(fourConnect.game.slots(col).spots(verFieldCount - 1 - row), shape)
+    new SpotView2D(fourConnect.game.slots(col).spots(rows - 1 - row), shape)
   }
 
 
@@ -67,33 +66,3 @@ class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
   protected def addNewChipView(newChip: ChipView2D): Unit = content.add(newChip)
 }
 
-class GameStartedSubject extends Subject[GameStartedSubject] {
-  var gameStarted = false
-
-  protected[gui] def startGame() = {
-    gameStarted = true
-    notifyObservers()
-  }
-
-  protected[gui] def finishGame() = {
-    gameStarted = false
-    notifyObservers()
-  }
-
-}
-
-class GameWinnerSubject extends Subject[GameWinnerSubject] {
-  var gameWinner: Chip = SpaceChip
-
-  protected[gui] def isFinish = gameWinner != SpaceChip
-
-  protected[gui] def startGame() = {
-    gameWinner = SpaceChip
-  }
-
-  protected[gui] def finishGame(winner: Chip) = {
-    gameWinner = winner
-    notifyObservers()
-  }
-
-}

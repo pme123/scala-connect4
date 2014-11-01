@@ -4,43 +4,40 @@ import pme.connect4.domain.GameConfig._
 import scalafx.scene.paint.{Color, PhongMaterial}
 
 
-/**
- * Created by pascal.mengelt on 15.10.2014.
- */
 object ConnectFourConfig3D {
-  val panelSize = (1024, 768)
-  val groundSize = 400
+
+  protected[d3] val panelSize = (1024, 768)
+  protected[d3] val groundSize = 400
 
 
-  val chipRadius = 12
-  val chipThickness = 2
+  protected[d3] val chipRadius = 12
+  protected[d3] val chipThickness = 2
 
-  val slotMargin = 2
-  val fieldWidth = 2*(chipRadius + slotMargin)
-  val fieldHeight = 2*(chipRadius + slotMargin)
-  val boardWidth = fieldWidth * cols
-  val boardHeight = fieldHeight * rows
-  val gameOffsetX = -rows/2*fieldWidth
-  val gameOffsetY = -150
+  protected[d3] val slotMargin = 2
+  protected[d3] val fieldWidth = 2 * (chipRadius + slotMargin)
+  protected[d3] val fieldHeight = 2 * (chipRadius + slotMargin)
+  protected[d3] val boardWidth = fieldWidth * cols
+  protected[d3] val boardHeight = fieldHeight * rows
+  protected[d3] val gameOffsetX = -rows / 2 * fieldWidth
+  protected[d3] val gameOffsetY = -150
 
-  val groundMaterial = new PhongMaterial {
+  protected val groundMaterial = new PhongMaterial {
     diffuseColor = Color.DarkGreen
     specularColor = Color.Green
   }
 
-  val yellowChipMaterial = new PhongMaterial {
+  protected val yellowChipMaterial = new PhongMaterial {
     diffuseColor = Color.Yellow
     specularColor = Color.LightYellow
   }
-  val redChipMaterial = new PhongMaterial {
+  protected val redChipMaterial = new PhongMaterial {
     diffuseColor = Color.DarkRed
     specularColor = Color.Red
   }
-  val gameMaterial = new PhongMaterial {
+  protected val gameMaterial = new PhongMaterial {
     diffuseColor = Color.DarkBlue
     specularColor = Color.Blue
   }
-
 
 
 }
