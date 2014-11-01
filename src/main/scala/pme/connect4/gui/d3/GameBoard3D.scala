@@ -8,7 +8,6 @@ import pme.connect4.gui.d3.ConnectFourConfig3D._
 import scalafx.Includes._
 import scalafx.scene.Group
 import scalafx.scene.input.MouseEvent
-import scalafx.scene.transform.Translate
 
 class GameBoard3D extends Group with GameBoard[ChipView3D, SpotView3D] {
 
@@ -34,6 +33,6 @@ class GameBoard3D extends Group with GameBoard[ChipView3D, SpotView3D] {
 
   protected def addNewChipView(newChip: ChipView3D): Unit = content.add(newChip)
 
-  protected def dropHeight(spotView: SpotView3D): Double =  (rows-spotView.getSpot.row)*fieldHeight
+  protected def dropHeight(spotView: SpotView3D): Double =  -(rows-spotView.getSpot.row)*fieldHeight
 
 }

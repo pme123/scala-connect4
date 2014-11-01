@@ -1,16 +1,12 @@
 package pme.connect4.gui
 
-import pme.connect4.domain.SpaceChip
 import pme.connect4.util.Observer
 
 import scalafx.geometry.Insets
 import scalafx.scene.control.Label
 import scalafx.scene.layout.AnchorPane
 
-/**
- * Created by pascal.mengelt on 29.09.2014.
- */
-class InfoPane2D(gameBoard: GameBoard2D) extends AnchorPane {
+class InfoPane(gameBoard: GameBoard[_ <: ChipView,_ <: SpotView]) extends AnchorPane {
 
   import pme.connect4.gui.ConnectFourConfig2D._
 

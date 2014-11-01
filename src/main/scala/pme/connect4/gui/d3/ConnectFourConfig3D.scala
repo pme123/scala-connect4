@@ -8,6 +8,7 @@ import scalafx.scene.paint.{Color, PhongMaterial}
  * Created by pascal.mengelt on 15.10.2014.
  */
 object ConnectFourConfig3D {
+  val panelSize = (1024, 768)
   val groundSize = 400
 
 

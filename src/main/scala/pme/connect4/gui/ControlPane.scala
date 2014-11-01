@@ -12,9 +12,9 @@ import scalafx.stage.Stage
 /**
  * Created by pascal.mengelt on 29.09.2014.
  */
-class ControlPane2D(gameBoard: GameBoard2D) extends HBox with Observer[GameStartedSubject] {
+class ControlPane(gameBoard: GameBoard[_ <: ChipView, _ <: SpotView]) extends HBox with Observer[GameStartedSubject] {
 
-  import pme.connect4.gui.ConnectFourConfig2D._
+//  import pme.connect4.gui.ConnectFourConfig2D._
 
   val newGameButton = new Button {
     text = "Start new Game"
@@ -62,7 +62,7 @@ class ControlPane2D(gameBoard: GameBoard2D) extends HBox with Observer[GameStart
   }
 
   content = List(newGameButton, changeColorButton, playAloneCheckBox)
-  margin = Insets(10, paneOffsetX, 20, paneOffsetX)
+  margin = Insets(10, 20, 20, 20)
   spacing = 20
   gameBoard.addGameStartedObserver(this)
 //  gameBoard.startNewGame

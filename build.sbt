@@ -2,6 +2,9 @@ name := "scala-connect4"
 
 version := "1.0"
 
+// Swing
+libraryDependencies <+= scalaVersion { "org.scala-lang" % "scala-swing" % _ }
+
 // ScalaFX
 
 libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.20-R6"

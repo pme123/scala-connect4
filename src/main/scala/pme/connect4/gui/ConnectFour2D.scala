@@ -1,12 +1,9 @@
 package pme.connect4.gui
 
-import javafx.event.{ActionEvent, EventHandler}
-
 import scalafx.application.JFXApp
 import scalafx.scene.Scene
-import scalafx.scene.layout.{VBox, BorderPane, Pane}
+import scalafx.scene.layout.VBox
 import scalafx.scene.paint.Color
-import scalafx.stage.PopupWindow
 
 object ConnectFour2D extends JFXApp {
 
@@ -28,12 +25,11 @@ object ConnectFour2D extends JFXApp {
     content = Seq(controlPane, gameBoard, infoPanel)
   }
 
-  lazy val gameBoard = new GameBoard2D
+  lazy val gameBoard:GameBoard[_ <: ChipView, _ <: SpotView] = new GameBoard2D
 
+  lazy val controlPane = new ControlPane(gameBoard)
 
-  lazy val controlPane = new ControlPane2D(gameBoard)
-
-  lazy val infoPanel = new InfoPane2D(gameBoard)
+  lazy val infoPanel = new InfoPane(gameBoard)
 
 
 }

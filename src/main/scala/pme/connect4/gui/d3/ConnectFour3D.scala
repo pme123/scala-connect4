@@ -1,20 +1,16 @@
 package pme.connect4.gui.d3
 
 
-import pme.connect4.domain.{ConnectFourGame, Chip, RedChip}
-import pme.connect4.domain.GameConfig._
-import pme.connect4.gui.ChipView2D._
 import pme.connect4.gui.d3.ConnectFourConfig3D._
+import pme.connect4.gui.{ControlPane, InfoPane}
 
 import scalafx.Includes._
-import scalafx.animation.{TranslateTransition, Timeline}
 import scalafx.application.JFXApp
 import scalafx.scene._
 import scalafx.scene.input.{KeyCode, KeyEvent, MouseEvent}
-import scalafx.scene.paint.{Color, PhongMaterial}
-import scalafx.scene.shape.{Box, Cylinder, Sphere}
-import scalafx.scene.transform.Rotate
-import scalafx.util.Duration
+import scalafx.scene.layout.VBox
+import scalafx.scene.paint.Color
+import scalafx.scene.shape.Box
 
 /** ScalaFX implementation of `MoleculeSampleApp` from tutorial
   * [[http://docs.oracle.com/javafx/8/3d_graphics/jfxpub-3d_graphics.htm Getting Started with JavaFX 3D Graphics]]
@@ -26,14 +22,15 @@ object ConnectFour3D extends JFXApp {
   app =>
   System.setProperty("prism.dirtyopts", "false")
 
-  private final val root = new Group()
-  private final val chipsToPlay = new Group()
-  private final val world = new Xform()
-  private final val camera: PerspectiveCamera = new PerspectiveCamera(true)
-  private final val cameraXform = new Xform()
-  private final val cameraXform2 = new Xform()
-  private final val cameraXform3 = new Xform()
-  private final val cameraDistance: Double = 450
+  private  val root = new VBox()
+  private   val content3d = new Group()
+  private  val chipsToPlay = new Group()
+  private  val world = new Xform()
+  private  val camera: PerspectiveCamera = new PerspectiveCamera(true)
+  private  val cameraXform = new Xform()
+  private  val cameraXform2 = new Xform()
+  private  val cameraXform3 = new Xform()
+  private  val cameraDistance: Double = 450
 
   private var gameBoard: GameBoard3D = new GameBoard3D
   private var ONE_FRAME: Double = 1.0 / 24.0
@@ -56,10 +53,10 @@ object ConnectFour3D extends JFXApp {
   buildGameBoard()
 
   stage = new JFXApp.PrimaryStage {
-    scene = new Scene(root, 1024, 768, depthBuffer = true, antiAliasing = SceneAntialiasing.Balanced) {
+    scene = new Scene(root, panelSize._1, panelSize._2, depthBuffer = true, antiAliasing = SceneAntialiasing.Balanced) {
       fill = Color.Gray
       title = "4 Connect"
-      camera = app.camera
+
     }
     handleKeyboard(scene(), world)
     handleMouse(scene(), world)
@@ -67,12 +64,21 @@ object ConnectFour3D extends JFXApp {
   }
 
   private def buildScene() {
-    root.children += world
+    root.content = Seq(controlPane,subScene    ,infoPanel  )
+    content3d.children += world
+
   }
 
+  def  subScene:SubScene = new SubScene(content3d, panelSize._1, panelSize._2-100,true, SceneAntialiasing.Disabled) {
+    camera = app.camera
+  }
+
+  lazy val controlPane = new ControlPane(gameBoard)
+
+  lazy val infoPanel = new InfoPane(gameBoard)
 
   private def buildCamera() {
-    root.children += cameraXform
+    content3d.children += cameraXform
     cameraXform.children += cameraXform2
     cameraXform2.children += cameraXform3
     cameraXform3.children += camera
@@ -96,10 +102,10 @@ object ConnectFour3D extends JFXApp {
   }
   private def buildGameBoard() {
     gameBoard.startNewGame()
-    root.children += gameBoard
+    content3d.children += gameBoard
   }
 
-   private def handleMouse(scene: Scene, root: Node) {
+   private def handleMouse(scene: Scene, content3d: Node) {
     scene.onMousePressed = (me: MouseEvent) => {
       mousePosX = me.sceneX
       mousePosY = me.sceneY
@@ -129,7 +135,7 @@ object ConnectFour3D extends JFXApp {
     }
   }
 
-  private def handleKeyboard(scene: Scene, root: Node) {
+  private def handleKeyboard(scene: Scene, content3d: Node) {
     //    val moveCamera: Boolean = true
     scene.onKeyPressed = (event: KeyEvent) => {
       //      val currentTime: Duration = null

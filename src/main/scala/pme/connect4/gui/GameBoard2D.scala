@@ -2,11 +2,12 @@ package pme.connect4.gui
 
 
 import javafx.scene.shape.Path
+
 import pme.connect4.domain.GameConfig._
 import pme.connect4.domain._
 import pme.connect4.gui.ChipView2D._
 import pme.connect4.gui.ConnectFourConfig2D._
-import pme.connect4.util.{Observer, Subject}
+import pme.connect4.util.Subject
 
 import scalafx.Includes._
 import scalafx.scene.input.MouseEvent
@@ -58,9 +59,6 @@ class GameBoard2D extends Pane with GameBoard[ChipView2D, SpotView2D] {
     new SpotView2D(fourConnect.game.slots(col).spots(verFieldCount - 1 - row), shape)
   }
 
-  def addGameStartedObserver(observer: Observer[GameStartedSubject]) = gameStartedSubject.addObserver(observer)
-
-  def addGameWinnerObserver(observer: Observer[GameWinnerSubject]) = gameWinnerSubject.addObserver(observer)
 
   protected def changeMaterial(chip: ChipView2D): Unit = chip.fill = colorMap(activeChip)
 

@@ -2,14 +2,14 @@ package pme.connect4.gui
 
 import pme.connect4.domain.GameConfig._
 import pme.connect4.domain._
-import pme.connect4.gui.ConnectFourConfig2D._
-import pme.connect4.gui.ConnectFourConfig2D.fieldHeight
-import pme.connect4.gui.d3.ConnectFourConfig3D._
+import pme.connect4.gui.ConnectFourConfig2D.{fieldHeight, _}
+import pme.connect4.util.Observer
 
 import scalafx.animation.TranslateTransition
+import scalafx.scene.Node
 import scalafx.util.Duration
 
-trait GameBoard[TC <: ChipView, TS <: SpotView] {
+trait GameBoard[TC <: ChipView, TS <: SpotView] extends Node {
   val gameStartedSubject = new GameStartedSubject
   val gameWinnerSubject = new GameWinnerSubject
 
@@ -62,9 +62,9 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
     val spotView = gameSpots(spot.col, spot.row)
     val distance =dropHeight(spotView)
     val transition = new TranslateTransition {
-      duration = Duration(distance/fieldHeight*100)
+      duration = Duration(Math.abs(distance)/fieldHeight*100)
       node = newChip
-      byY = -distance
+      byY = distance
     }
     transition.play()
     verifyTurn()
@@ -125,4 +125,9 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] {
   def playAlone(playAlone: Boolean) = {
     playAloneMode = playAlone
   }
+
+  def addGameStartedObserver(observer: Observer[GameStartedSubject]) = gameStartedSubject.addObserver(observer)
+
+  def addGameWinnerObserver(observer: Observer[GameWinnerSubject]) = gameWinnerSubject.addObserver(observer)
+
 }
