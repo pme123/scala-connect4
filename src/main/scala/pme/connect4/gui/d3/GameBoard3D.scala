@@ -33,6 +33,6 @@ class GameBoard3D extends Group with GameBoard[ChipView3D, SpotView3D] {
 
   protected def addNewChipView(newChip: ChipView3D): Unit = content.add(newChip)
 
-  protected def dropHeight(spotView: SpotView3D): Double =  -(rows-spotView.getSpot.row)*fieldHeight
+  protected def dropHeight(spotView: SpotView3D): Double =  -(rows-spotView.getSpot.row)*fieldWidth
 
 }

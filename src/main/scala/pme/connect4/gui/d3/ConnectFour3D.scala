@@ -7,7 +7,7 @@ import pme.connect4.gui.{ControlPane, InfoPane}
 import scalafx.Includes._
 import scalafx.application.JFXApp
 import scalafx.scene._
-import scalafx.scene.input.{KeyCode, KeyEvent, MouseEvent}
+import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.VBox
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Box
@@ -24,7 +24,6 @@ object ConnectFour3D extends JFXApp {
 
   private  val root = new VBox()
   private   val content3d = new Group()
-  private  val chipsToPlay = new Group()
   private  val world = new Xform()
   private  val camera: PerspectiveCamera = new PerspectiveCamera(true)
   private  val cameraXform = new Xform()
@@ -33,11 +32,6 @@ object ConnectFour3D extends JFXApp {
   private  val cameraDistance: Double = 450
 
   private var gameBoard: GameBoard3D = new GameBoard3D
-  private var ONE_FRAME: Double = 1.0 / 24.0
-  private var DELTA_MULTIPLIER: Double = 200.0
-  private val CONTROL_MULTIPLIER: Double = 0.1
-  private val SHIFT_MULTIPLIER: Double = 0.1
-  private val ALT_MULTIPLIER: Double = 0.5
   private var mousePosX: Double = .0
   private var mousePosY: Double = .0
   private var mouseOldX: Double = .0
@@ -58,7 +52,6 @@ object ConnectFour3D extends JFXApp {
       title = "4 Connect"
 
     }
-    handleKeyboard(scene(), world)
     handleMouse(scene(), world)
 
   }
@@ -94,7 +87,7 @@ object ConnectFour3D extends JFXApp {
   private def buildGround() {
 
     val ground = new Box(groundSize, -gameOffsetY, groundSize) {
-      translateY = gameOffsetY-fieldHeight
+      translateY = gameOffsetY-fieldWidth
       material = groundMaterial
     }
 
@@ -135,69 +128,5 @@ object ConnectFour3D extends JFXApp {
     }
   }
 
-  private def handleKeyboard(scene: Scene, content3d: Node) {
-    //    val moveCamera: Boolean = true
-    scene.onKeyPressed = (event: KeyEvent) => {
-      //      val currentTime: Duration = null
-      event.getCode match {
-        case KeyCode.Z =>
-          if (event.isShiftDown) {
-            cameraXform.ry.setAngle(0.0)
-            cameraXform.rx.setAngle(0.0)
-            camera.setTranslateZ(-300.0)
-          }
-          cameraXform2.t.setX(0.0)
-          cameraXform2.t.setY(0.0)
-        case KeyCode.UP =>
-          if (event.isControlDown && event.isShiftDown) {
-            cameraXform2.t.setY(cameraXform2.t.getY - 10.0 * CONTROL_MULTIPLIER)
-          } else if (event.isAltDown && event.isShiftDown) {
-            cameraXform.rx.setAngle(cameraXform.rx.getAngle - 10.0 * ALT_MULTIPLIER)
-          } else if (event.isControlDown) {
-            cameraXform2.t.setY(cameraXform2.t.getY - 1.0 * CONTROL_MULTIPLIER)
-          } else if (event.isAltDown) {
-            cameraXform.rx.setAngle(cameraXform.rx.getAngle - 2.0 * ALT_MULTIPLIER)
-          } else if (event.isShiftDown) {
-            val z: Double = camera.getTranslateZ
-            val newZ: Double = z + 5.0 * SHIFT_MULTIPLIER
-            camera.setTranslateZ(newZ)
-          }
-        case KeyCode.DOWN =>
-          if (event.isControlDown && event.isShiftDown) {
-            cameraXform2.t.setY(cameraXform2.t.getY + 10.0 * CONTROL_MULTIPLIER)
-          } else if (event.isAltDown && event.isShiftDown) {
-            cameraXform.rx.setAngle(cameraXform.rx.getAngle + 10.0 * ALT_MULTIPLIER)
-          } else if (event.isControlDown) {
-            cameraXform2.t.setY(cameraXform2.t.getY + 1.0 * CONTROL_MULTIPLIER)
-          } else if (event.isAltDown) {
-            cameraXform.rx.setAngle(cameraXform.rx.getAngle + 2.0 * ALT_MULTIPLIER)
-          } else if (event.isShiftDown) {
-            val z: Double = camera.getTranslateZ
-            val newZ: Double = z - 5.0 * SHIFT_MULTIPLIER
-            camera.setTranslateZ(newZ)
-          }
-        case KeyCode.RIGHT =>
-          if (event.isControlDown && event.isShiftDown) {
-            cameraXform2.t.setX(cameraXform2.t.getX + 10.0 * CONTROL_MULTIPLIER)
-          } else if (event.isAltDown && event.isShiftDown) {
-            cameraXform.ry.setAngle(cameraXform.ry.getAngle - 10.0 * ALT_MULTIPLIER)
-          } else if (event.isControlDown) {
-            cameraXform2.t.setX(cameraXform2.t.getX + 1.0 * CONTROL_MULTIPLIER)
-          } else if (event.isAltDown) {
-            cameraXform.ry.setAngle(cameraXform.ry.getAngle - 2.0 * ALT_MULTIPLIER)
-          }
-        case KeyCode.LEFT =>
-          if (event.isControlDown && event.isShiftDown) {
-            cameraXform2.t.setX(cameraXform2.t.getX - 10.0 * CONTROL_MULTIPLIER)
-          } else if (event.isAltDown && event.isShiftDown) {
-            cameraXform.ry.setAngle(cameraXform.ry.getAngle + 10.0 * ALT_MULTIPLIER)
-          } else if (event.isControlDown) {
-            cameraXform2.t.setX(cameraXform2.t.getX - 1.0 * CONTROL_MULTIPLIER)
-          } else if (event.isAltDown) {
-            cameraXform.ry.setAngle(cameraXform.ry.getAngle + 2.0 * ALT_MULTIPLIER)
-          }
-        case _ =>
-      }
-    }
-  }
+
 }

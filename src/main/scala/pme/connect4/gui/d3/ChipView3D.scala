@@ -17,14 +17,14 @@ object ChipView3D {
 
 }
 
-class ChipView3D(chip: Chip) extends Cylinder(chipRadius, chipThickness) with ChipView {
+class ChipView3D(chip: Chip) extends Cylinder(ConnectFourConfig3D().chipRadius, chipThickness) with ChipView {
   visible = true
   effect = new InnerShadow {
     offsetX = -3
     offsetY = -3
     radius = 12
   }
- translateY = gameOffsetY + (3+rows)*fieldHeight
+ translateY = gameOffsetY + (3+rows)*ConnectFourConfig3D().fieldWidth
   material = materialMap(chip)
   rotationAxis = Rotate.XAxis
   rotate = 90.0

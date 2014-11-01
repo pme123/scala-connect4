@@ -4,7 +4,7 @@ import javafx.scene.shape.Path
 
 import pme.connect4.domain.Spot
 import pme.connect4.gui.SpotView
-import pme.connect4.gui.d3.ConnectFourConfig3D.{fieldHeight, fieldWidth, _}
+import pme.connect4.gui.d3.ConnectFourConfig3D._
 
 import scalafx.scene.paint.Color
 import scalafx.scene.shape
@@ -22,7 +22,7 @@ object SpotView3D {
       translateX = calcOffsetX(col)-fieldWidth/2
       translateY = calcOffsetY(row)-fieldWidth/2
       width = fieldWidth
-      height = fieldHeight
+      height = fieldWidth
       fill = Color.Blue
 
     }
@@ -47,7 +47,7 @@ object SpotView3D {
   }
 
   def calcOffsetY(row: Int): Double = {
-    gameOffsetY +(3 + row) * fieldHeight
+    gameOffsetY +(3 + row) * fieldWidth
   }
 }
 class SpotView3D(val spot: Spot, val path: javafx.scene.shape.Path) extends shape.Path(path) with SpotView {
