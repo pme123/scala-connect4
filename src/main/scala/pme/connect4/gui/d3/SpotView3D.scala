@@ -14,7 +14,6 @@ object SpotView3D {
   def createSpotView(col:Int, row:Int): javafx.scene.shape.Path =   {
     def createOneField(offset: Int): Path = {
       val path: Path = javafx.scene.shape.Shape.subtract(rect, hole).asInstanceOf[Path]
-      path.setTranslateZ(chipThickness * offset)
       path
     }
 
@@ -32,9 +31,6 @@ object SpotView3D {
       radiusX = chipRadius
       radiusY = chipRadius
     }
-
-//    val paths: IndexedSeq[shape.Shape] = for(i <- -1 to 1)yield createOneField(i)
-//    paths.foldRight(shape)
 
     val shape = Shape.subtract(rect, hole).asInstanceOf[Path]
     shape

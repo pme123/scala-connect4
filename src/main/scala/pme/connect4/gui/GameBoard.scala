@@ -24,6 +24,7 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] extends Node {
     gameStartedSubject.gameStarted = false
     chipsToPlay = initChipsToPlay
     gameSpots = initGameSpots
+
   }
 
   private def initChipsToPlay: Seq[TC] = {

@@ -2,38 +2,43 @@ package pme.connect4.gui
 
 import pme.connect4.util.Observer
 
+import scalafx.beans.property.ObjectProperty
 import scalafx.geometry.Insets
+import scalafx.scene.Group
 import scalafx.scene.control.Label
-import scalafx.scene.layout.AnchorPane
 
-class InfoPane(gameBoard: GameBoard[_ <: ChipView,_ <: SpotView]) extends AnchorPane {
+class InfoPane(gameBoard: GameBoard[_ <: ChipView,_ <: SpotView]) extends Group {
 
   import pme.connect4.gui.ConnectFourConfig._
 
-  val info = new Label() {
-    layoutX = paneOffsetX
-    text = "Welcome  to  4-Connect!"
- 
-  }
-
-
-
-
-  content = List(info)
-  margin = Insets(10, 0, 20, 0)
+  content = View
   gameBoard.addGameStartedObserver(new GameStartedObserver)
   gameBoard.addGameWinnerObserver(new GameWinnerObserver)
 
-  private class GameStartedObserver extends Observer[GameStartedSubject]{
-    def receiveUpdate(subject: GameStartedSubject) = {
-      if (subject.gameStarted) info.text = "Game is running!"
-      else info.text = "Game is finished!"
+
+  private object Model {
+    val text = ObjectProperty(this, "text", "Welcome  to  4-Connect!")
+  }
+
+  private object View extends Group {
+    val info = new Label() {
+      layoutX = paneOffsetX
+      text <== Model.text
     }
+    content = List(info)
+    margin = Insets(10, 0, 20, 0)
   }
 
   private class GameWinnerObserver extends Observer[GameWinnerSubject]{
     def receiveUpdate(subject: GameWinnerSubject) = {
-      info.text = "%s\nThe winner is %s.".format(info.text.value, subject.gameWinner.name)
+      Model.text() = "%s\nThe winner is %s.".format(View.info.text.value, subject.gameWinner.name)
+    }
+  }
+
+  private class GameStartedObserver extends Observer[GameStartedSubject]{
+    def receiveUpdate(subject: GameStartedSubject) = {
+      if (subject.gameStarted) Model.text() = "Game is running!"
+      else Model.text() = "Game is finished!"
     }
   }
 }

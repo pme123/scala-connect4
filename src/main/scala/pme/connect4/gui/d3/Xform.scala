@@ -83,7 +83,7 @@ class Xform extends javafx.scene.Group {
     _ry.angle = y
   }
 
-  def rotateZ:Double = _rz.angle()
+  def rotateZ = _rz.angle
   def rotateZ_=(z: Double) {
     _rz.angle = z
   }

@@ -25,9 +25,7 @@ class GameBoard3D extends Group with GameBoard[ChipView3D, SpotView3D] {
     chipView
   }
   protected def createSpot(col: Int, row: Int): SpotView3D = {
-    val spot = new SpotView3D(fourConnect.game.slots(col).spots(row), SpotView3D.createSpotView(col,row))
-
-    spot
+    new SpotView3D(fourConnect.game.slots(col).spots(row), SpotView3D.createSpotView(col,row))
   }
    protected def changeMaterial(chip: ChipView3D): Unit = chip.material = materialMap(activeChip)
 
