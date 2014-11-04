@@ -12,6 +12,7 @@ import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.VBox
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Box
+import scalafx.scene.transform.Rotate
 
 /** ScalaFX implementation of `MoleculeSampleApp` from tutorial
   * [[http://docs.oracle.com/javafx/8/3d_graphics/jfxpub-3d_graphics.htm Getting Started with JavaFX 3D Graphics]]
@@ -83,11 +84,22 @@ object ConnectFour3D extends JFXApp {
       gameBoard.startNewGame()
       content3d.children += gameBoard
     }
-
+    private def buildLight() = {
+      val light = new PointLight() {
+        color = Color.White
+        rotationAxis = Rotate.ZAxis
+        rotate = -45
+        translateX = 50
+        translateY = 50
+        translateZ = -50
+      }
+      root.children += light
+    }
     buildScene()
     buildCamera()
     buildGround()
     buildGameBoard()
+  //  buildLight()
   }
 
 

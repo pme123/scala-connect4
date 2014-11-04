@@ -5,10 +5,11 @@ import pme.connect4.domain.{Chip, RedChip, YellowChip}
 import pme.connect4.gui.ChipView
 import pme.connect4.gui.d3.ChipView3D._
 import pme.connect4.gui.d3.ConnectFourConfig3D._
+import pme.connect4.gui.util.MeshUtil
 
 import scalafx.scene.effect.InnerShadow
 import scalafx.scene.paint.Material
-import scalafx.scene.shape.Cylinder
+import scalafx.scene.shape.MeshView
 import scalafx.scene.transform.Rotate
 
 
@@ -17,15 +18,23 @@ object ChipView3D {
 
 }
 
-class ChipView3D(chip: Chip) extends Cylinder(ConnectFourConfig3D().chipRadius, chipThickness) with ChipView {
+class ChipView3D(chip: Chip) extends MeshView with ChipView {
+  mesh = MeshUtil.loadMeshViews(chipMeshFile)
+
+  //  translateX = calcOffsetX(col)
+  translateY = gameOffsetY + (3 + rows) * ConnectFourConfig3D().fieldWidth
+  scaleX = 24
+  scaleY = 24
+  scaleZ = 24
+  rotationAxis = Rotate.XAxis
+  rotate = 90.0
+  material = materialMap(chip)
+
   visible = true
   effect = new InnerShadow {
     offsetX = -3
     offsetY = -3
     radius = 12
   }
- translateY = gameOffsetY + (3+rows)*ConnectFourConfig3D().fieldWidth
-  material = materialMap(chip)
-  rotationAxis = Rotate.XAxis
-  rotate = 90.0
+
 }

@@ -5,6 +5,10 @@ import pme.connect4.gui.ConnectFourConfig
 import scalafx.scene.paint.{Color, PhongMaterial}
 
 object ConnectFourConfig3D {
+  protected[d3] val chipMeshFile = "3d/chip.stl"
+  protected[d3] val spotMeshFile = "3d/spot.stl"
+  protected[d3] val pillarMeshFile = "3d/pillar.stl"
+  protected[d3] val clapMeshFile = "3d/clap.stl"
   protected[d3] val panelSize = (1024, 768)
   protected[d3] val groundSize = 400
 

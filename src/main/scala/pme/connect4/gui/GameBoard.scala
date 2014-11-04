@@ -2,10 +2,12 @@ package pme.connect4.gui
 
 import pme.connect4.domain.GameConfig._
 import pme.connect4.domain._
-import pme.connect4.util.{Subject, Observer}
+import pme.connect4.util.{Observer, Subject}
 
 import scalafx.animation.TranslateTransition
 import scalafx.scene.Node
+import scalafx.Includes._
+import scalafx.scene.input.MouseEvent
 import scalafx.util.Duration
 
 trait GameBoard[TC <: ChipView, TS <: SpotView] extends Node {
@@ -31,11 +33,15 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] extends Node {
     for {
       col <- 0 until cols
     } yield {
-      createChip(col)
+      val chipView =createChip(col)
+      addMouseListener(col, chipView)
+      chipView
     }
   }
 
-  protected def createChip(col: Int): TC
+  protected def createChip(col: Int): TC   =createChip(col, activeChip)
+
+  protected def createChip(col: Int, chip: Chip): TC
 
   private def initGameSpots: Map[(Int,Int), TS] = {
     (for {
@@ -48,6 +54,10 @@ trait GameBoard[TC <: ChipView, TS <: SpotView] extends Node {
   }
 
   protected def createSpot(col: Int, row: Int): TS
+
+  def addMouseListener(col: Int, chipView: ChipView):Unit =
+    chipView.onMouseClicked = (me: MouseEvent) => handleChipSelected(col, chipView)
+
 
   protected def handleChipSelected(col: Int, chip: ChipView) = {
     fourConnect.dropChip(col, activeChip)
