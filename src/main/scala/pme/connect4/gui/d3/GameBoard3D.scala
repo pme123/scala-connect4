@@ -57,7 +57,6 @@ class GameBoard3D extends Group with GameBoard[ChipView3D, SpotView3D] {
     {
       val mesh = MeshUtil.loadMeshViews(clapMeshFile)
       new MeshView(mesh){
-      //  translateX = (cols/2*fieldWidth+fieldWidth/2)
         translateY = -(rows/2*fieldWidth)
         scaleX = 9.7
         scaleY = 9

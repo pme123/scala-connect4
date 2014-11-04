@@ -5,10 +5,11 @@ import pme.connect4.gui.SpotView
 import pme.connect4.gui.d3.ConnectFourConfig3D._
 import pme.connect4.gui.util.MeshUtil
 
-import scalafx.animation._
+import scalafx.Includes._
+import scalafx.animation.Timeline
+import scalafx.animation.Timeline.Indefinite
 import scalafx.scene.shape._
 import scalafx.scene.transform.Rotate
-import scalafx.util.Duration
 
 object SpotView3D {
   def calcOffsetX(col: Int): Double = {
@@ -34,19 +35,26 @@ class SpotView3D(val spot: Spot) extends MeshView with SpotView {
   rotate = 90.0
   material = gameMaterial
 
-   def getSpot = spot
+  def getSpot = spot
 
 
 
   override def blink() {
-    val animation = new RotateTransition() {
-      fromAngle = 0
-      toAngle = 360
-      duration = Duration(1000)
-      cycleCount = Timeline.Indefinite
+    new Timeline() {
+      cycleCount = Indefinite
       autoReverse = true
-      node = self
-    }
-   animation.play()
+      keyFrames = Seq(
+        at(0 s) {
+          material -> groundMaterial
+        },
+        at(0.5 s) {
+          material -> gameMaterial
+        } ,
+        at(1 s) {
+          material -> groundMaterial
+        }
+      )
+    }.play()
+
   }
 }
